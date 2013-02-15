@@ -74,7 +74,8 @@ private static final int
 private static final int
   OSD_NULL                 =0,
   OSD_READ_CMD             =1,
-  OSD_WRITE_CMD            =2;
+  OSD_WRITE_CMD            =2,
+  OSD_GET_FONT             =3;
 
 
 // initialize the serial port selected in the listBox
@@ -157,14 +158,19 @@ public void READ(){
   p = 0;
   inBuf[0] = OSD_READ_CMD;
   evaluateCommand((byte)MSP_OSD, 1);
-
 }
 
 public void WRITE(){
   p = 0;
   inBuf[0] = OSD_WRITE_CMD;
   evaluateCommand((byte)MSP_OSD, 1);
+}
 
+public void FONT_UPLOAD(){
+  System.out.println("FONT_UPLOAD");
+  p = 0;
+  inBuf[0] = OSD_GET_FONT;
+  evaluateCommand((byte)MSP_OSD, 1);
 }
 
 // coded by Eberhard Rensch
@@ -275,23 +281,23 @@ void tailSerialReply() {
   serialize8(outChecksum);
 }
 
-public void evaluateCommand(byte cmd, int dataSize) {
-   if (toggleMSP_Data == false) return;
+public void evaluateCommand(byte cmd, int size) {
+  if (toggleMSP_Data == false) return;
   try{
   int icmd = (int)(cmd&0xFF);
+  //System.out.println("evaluateCommand "+icmd+" size "+size);
   switch(icmd) {
-
   case MSP_OSD:
- 
   {
     int cmd_internal = read8();
+    //System.out.println("MSP_OSD "+cmd_internal);
     if(cmd_internal == OSD_NULL) {
       headSerialReply(MSP_OSD, 1);
       serialize8(OSD_NULL);
     }
 
     if(cmd_internal == OSD_READ_CMD) {
-      if(dataSize == 1) {
+      if(size == 1) {
 	// Send a NULL reply
 	headSerialReply(MSP_OSD, 1);
 	serialize8(OSD_READ_CMD);
@@ -307,11 +313,30 @@ public void evaluateCommand(byte cmd, int dataSize) {
       }
     }
 
-    if(cmd_internal == OSD_WRITE_CMD && dataSize == 1) {
+    if(cmd_internal == OSD_WRITE_CMD && size == 1) {
       headSerialReply(MSP_OSD, CONFIGITEMS+1);
       serialize8(OSD_WRITE_CMD);
       for(int i = 0; i < CONFIGITEMS; i++)
         serialize8(int(confItem[i].value()));
+    }
+
+    if(cmd_internal == OSD_GET_FONT) {
+      if( size == 1) {
+	headSerialReply(MSP_OSD, 3);
+	serialize8(OSD_GET_FONT);
+	serialize16(7456);
+      }
+      else if(size == 2) {
+	int cindex = read8();
+	//System.out.println("send char "+cindex);
+	headSerialReply(MSP_OSD, 56);
+        serialize8(OSD_GET_FONT);
+	for(int i = 0; i < 54; i++)
+	   serialize8(int(raw_font[cindex][i]));
+	serialize8(cindex);
+       
+	System.out.println("Sent Char "+cindex);
+      }
     }
     break;
   }
@@ -464,8 +489,7 @@ public void evaluateCommand(byte cmd, int dataSize) {
 void MWData_Com() {
   if (toggleMSP_Data == false) return;
   List<Character> payload;
-  int i,aa;
-  float val,inter,a,b,h;
+  int i;
   int c = 0;
   if ((init_com==1)  && (toggleMSP_Data == true)) {
     
@@ -473,6 +497,7 @@ void MWData_Com() {
     while (g_serial.available()>0) {
      try{
       c = (g_serial.read());
+      //System.out.println("serial rcvd = "+c);
      } catch (Exception e) { // null pointer or serial port dead
         System.out.println("write error " + e);
      }
@@ -497,6 +522,7 @@ void MWData_Com() {
       else if (c_state == HEADER_ARROW || c_state == HEADER_ERR) {
         /* is this an error message? */
         err_rcvd = (c_state == HEADER_ERR);        /* now we are expecting the payload size */
+
         dataSize = (c&0xFF);
         /* reset index variables */
         p = 0;
@@ -523,7 +549,7 @@ void MWData_Com() {
           } else {
             /* we got a valid response packet, evaluate it */
             if ((init_com==1)  && (toggleMSP_Data == true)) {
-            evaluateCommand(cmd, (int)dataSize);
+            evaluateCommand(cmd, dataSize);
             }
            
           }

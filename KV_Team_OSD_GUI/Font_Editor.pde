@@ -185,7 +185,7 @@ buttonEditFont = controlP5.addButton("EditFont",1,20,25,60,16)
 buttonBrowseFile = controlP5.addButton("Browse",1,20,50,60,16)
 .setGroup(MGUploadF);
 ;
-buttonSendFile = controlP5.addButton("Send",1,20,75,60,16)
+buttonSendFile = controlP5.addButton("FONT_UPLOAD",1,20,75,60,16)
 .setGroup(MGUploadF);
 ;
  

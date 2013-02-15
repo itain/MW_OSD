@@ -398,6 +398,14 @@ void displayIntro(void)
   MAX7456_WriteString_P(message8, RushduinoVersionPosition+125+LINE+LINE+LINE+LINE+LINE+LINE+LINE);
 }
 
+void displayFontScreen(void) {
+  MAX7456_WriteString_P(PSTR("UPLOADING FONT"), 35);
+  MAX7456_WriteString(itoa(nextCharToRequest, screenBuffer, 10), 51);
+
+  for(uint16_t i = 0; i < 256; i++)
+    screen[90+i] = i;
+}
+
 void displayGPSPosition(void)
 {
   if(!GPS_fix)

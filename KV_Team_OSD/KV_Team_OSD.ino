@@ -33,9 +33,9 @@ February  2013  V2.2
 
 
 
-/************************************************************************************************************/
-/*        Created for Multiwii r1240 or higher and using the KV_OSD_Team.mcm Chararter map file.            */
-/************************************************************************************************************/
+/******************************************************************************************************/
+/*      Created for Multiwii r1240 or higher and using the KV_OSD_Team.mcm Chararter map file.        */
+/******************************************************************************************************/
 
 
 // This software communicates using MSP via the serial protocol. Therefore Multiwii develop-dependent.
@@ -98,7 +98,10 @@ void setup()
 }
 
 void setMspRequests() {
-  if(configMode) {
+  if(fontMode) {
+      modeMSPRequests = REQ_MSP_FONT;
+  }
+  else if(configMode) {
     modeMSPRequests = 
       REQ_MSP_IDENT|
       REQ_MSP_STATUS|
@@ -184,9 +187,8 @@ void loop()
   if((currentMillis - previous_millis_low) >= lo_speed_cycle)  // 10 Hz (Executed every 100ms)
   {
     previous_millis_low = currentMillis;    
-    if(!serialWait){
+    if(!fontMode)
       blankserialRequest(MSP_ATTITUDE);
-    }
   }  // End of slow Timed Service Routine (100ms loop)
 
   if((currentMillis - previous_millis_high) >= hi_speed_cycle)  // 20 Hz (Executed every 50ms)
@@ -200,56 +202,57 @@ void loop()
     if(Settings[S_DISPLAYRSSI])
       calculateRssi();
 
-    if(!serialWait) {
-      uint8_t MSPcmdsend;
-      if(queuedMSPRequests == 0)
-        queuedMSPRequests = modeMSPRequests;
-      uint32_t req = queuedMSPRequests & -queuedMSPRequests;
-      queuedMSPRequests &= ~req;
-      switch(req) {
-      case REQ_MSP_IDENT:
-        MSPcmdsend = MSP_IDENT;
-        break;
-      case REQ_MSP_STATUS:
-        MSPcmdsend = MSP_STATUS;
-        break;
-      case REQ_MSP_RAW_IMU:
-        MSPcmdsend = MSP_RAW_IMU;
-        break;
-      case REQ_MSP_RC:
-        MSPcmdsend = MSP_RC;
-        break;
-      case REQ_MSP_RAW_GPS:
-        MSPcmdsend = MSP_RAW_GPS;
-        break;
-      case REQ_MSP_COMP_GPS:
-        MSPcmdsend = MSP_COMP_GPS;
-        break;
-      case REQ_MSP_ATTITUDE:
-        MSPcmdsend = MSP_ATTITUDE;
-        break;
-      case REQ_MSP_ALTITUDE:
-        MSPcmdsend = MSP_ALTITUDE;
-        break;
-      case REQ_MSP_ANALOG:
-        MSPcmdsend = MSP_ANALOG;
-        break;
-      case REQ_MSP_RC_TUNING:
-        MSPcmdsend = MSP_RC_TUNING;
-        break;
-      case REQ_MSP_PID:
-        MSPcmdsend = MSP_PID;
-        break;
-      case REQ_MSP_BOX:
+    uint8_t MSPcmdsend;
+    if(queuedMSPRequests == 0)
+      queuedMSPRequests = modeMSPRequests;
+    uint32_t req = queuedMSPRequests & -queuedMSPRequests;
+    queuedMSPRequests &= ~req;
+    switch(req) {
+    case REQ_MSP_IDENT:
+      MSPcmdsend = MSP_IDENT;
+      break;
+    case REQ_MSP_STATUS:
+      MSPcmdsend = MSP_STATUS;
+      break;
+    case REQ_MSP_RAW_IMU:
+      MSPcmdsend = MSP_RAW_IMU;
+      break;
+    case REQ_MSP_RC:
+      MSPcmdsend = MSP_RC;
+      break;
+    case REQ_MSP_RAW_GPS:
+      MSPcmdsend = MSP_RAW_GPS;
+      break;
+    case REQ_MSP_COMP_GPS:
+      MSPcmdsend = MSP_COMP_GPS;
+      break;
+    case REQ_MSP_ATTITUDE:
+      MSPcmdsend = MSP_ATTITUDE;
+      break;
+    case REQ_MSP_ALTITUDE:
+      MSPcmdsend = MSP_ALTITUDE;
+      break;
+    case REQ_MSP_ANALOG:
+      MSPcmdsend = MSP_ANALOG;
+      break;
+    case REQ_MSP_RC_TUNING:
+      MSPcmdsend = MSP_RC_TUNING;
+      break;
+    case REQ_MSP_PID:
+      MSPcmdsend = MSP_PID;
+      break;
+    case REQ_MSP_BOX:
 #ifdef USE_BOXNAMES
-        MSPcmdsend = MSP_BOXNAMES;
+      MSPcmdsend = MSP_BOXNAMES;
 #else
-        MSPcmdsend = MSP_BOXIDS;
+      MSPcmdsend = MSP_BOXIDS;
 #endif
-        break;
-      }
-      blankserialRequest(MSPcmdsend);      
-    } // End of serial wait
+      break;
+    case REQ_MSP_FONT:
+      MSPcmdsend = MSP_OSD;
+      break;
+    }
+    blankserialRequest(MSPcmdsend);      
 
     MAX7456_DrawScreen();
     if(onTime < 9)
@@ -266,7 +269,10 @@ void loop()
         configMode=1;
         setMspRequests();
       }
-      if(configMode)
+      if(fontMode) {
+         displayFontScreen();
+      }
+      else if(configMode)
       {
         displayConfigScreen();
       }
@@ -432,4 +438,45 @@ void checkEEPROM(void)
         EEPROM.write(en,EEPROM_DEFAULT[en]);
     }
   }
+}
+
+uint8_t safeMode() {
+  return 1;	// XXX
+}
+
+void initFontMode() {
+  if(armed || configMode || fontMode|| !safeMode()) 
+    return;
+
+  for(int i = 0; i < 32; i++)
+     needFontUpdate[i] = 0xff;
+
+  fontMode = 1;
+  nextCharToRequest = 0;
+  setMspRequests();
+}
+
+void findNextCharToRequest() {
+  if(!fontMode)
+    return;
+
+  for(int i = 0; i < 32; i++) {
+     uint8_t v = needFontUpdate[i];
+     if(v == 0)
+       continue;
+     for(uint8_t j = 0; j < 8; j++) {
+       if(needFontUpdate[i] & (1<<j)) {
+         nextCharToRequest = i * 8 + j;
+         return;
+       }
+     }
+  }
+  // Nothing to request,
+  fontMode = 0;
+  MAX7456Setup();
+  setMspRequests();
+}
+
+void fontCharReceived(uint8_t c) {
+  needFontUpdate[c/8] &= ~(1<< (c & 7));
 }
