@@ -106,7 +106,7 @@ void displayTemperature(void)        // WILL WORK ONLY WITH V1.2
 {
   itoa(TempConverter(temperature), screenBuffer, 10);
   uint8_t xx = FindNull();
-  screenBuffer[xx++] = temperatureUnitAdd[Settings[S_UNITSYSTEM]];
+  screenBuffer[xx++] = Settings[S_UNITSYSTEM] ? SYM_TEMP_F : SYM_TEMP_C;
   screenBuffer[xx] = 0;
   MAX7456_WriteString(screenBuffer,getPosition(temperaturePosition));
 }
@@ -222,18 +222,14 @@ void displayHorizon(int rollAngle, int pitchAngle)
 
 void displayVoltage(void)
 {
-  if (Settings[S_VIDVOLTAGE_VBAT]){
+  if (Settings[S_VIDVOLTAGE_VBAT]) {
     vidvoltage=MwVBat;
   }
-  if (Settings[S_MAINVOLTAGE_VBAT]){
+  if (Settings[S_MAINVOLTAGE_VBAT]) {
     voltage=MwVBat;
   }
-  ItoaPadded(voltage, screenBuffer, 4, 3);
-  screenBuffer[4] = SYM_VOLT;
-  screenBuffer[5] = 0;
-  MAX7456_WriteString(screenBuffer,getPosition(voltagePosition));
 
-  if (Settings[S_SHOWBATLEVELEVOLUTION]){
+  if (Settings[S_SHOWBATLEVELEVOLUTION]) {
     // For battery evolution display
     int BATTEV1 =Settings[S_BATCELLS] * 35;
     int BATTEV2 =Settings[S_BATCELLS] * 36;
@@ -253,17 +249,17 @@ void displayVoltage(void)
   else {
     screenBuffer[0]=SYM_MAIN_BATT;
   }
-  screenBuffer[1]=0;
-  MAX7456_WriteString(screenBuffer,getPosition(voltagePosition)-1);
+  ItoaPadded(voltage, screenBuffer+1, 4, 3);
+  screenBuffer[5] = SYM_VOLT;
+  screenBuffer[6] = 0;
+  MAX7456_WriteString(screenBuffer,getPosition(voltagePosition));
 
   if (Settings[S_VIDVOLTAGE]){
-    ItoaPadded(vidvoltage, screenBuffer, 4, 3);
-    screenBuffer[4]=SYM_VOLT;
-    screenBuffer[5]=0;
-    MAX7456_WriteString(screenBuffer,getPosition(vidvoltagePosition));
     screenBuffer[0]=SYM_VID_BAT;
-    screenBuffer[1]=0;
-    MAX7456_WriteString(screenBuffer,getPosition(vidvoltagePosition)-1);
+    ItoaPadded(vidvoltage, screenBuffer+1, 4, 3);
+    screenBuffer[5]=SYM_VOLT;
+    screenBuffer[6]=0;
+    MAX7456_WriteString(screenBuffer,getPosition(vidvoltagePosition));
   }
 }
 
@@ -276,8 +272,8 @@ void displayCurrentThrottle(void)
   screenBuffer[1]=0;
   MAX7456_WriteString(screenBuffer,getPosition(CurrentThrottlePosition));
   if(!armed) {
-    screenBuffer[0]=' ';
-    screenBuffer[1]=' ';
+    screenBuffer[0]='-';
+    screenBuffer[1]='-';
     screenBuffer[2]='-';
     screenBuffer[3]='-';
     screenBuffer[4]=0;
@@ -425,7 +421,7 @@ void displayGPSPosition(void)
     }
   }
 
-  screenBuffer[0] = MwGPSAltPositionAdd[Settings[S_UNITSYSTEM]];
+  screenBuffer[0] = Settings[S_UNITSYSTEM] ? SYM_ALTFT : SYM_ALTM;
   uint16_t xx;
   if(Settings[S_UNITSYSTEM])
     xx = GPS_altitude * 3.2808; // Mt to Feet
@@ -448,7 +444,7 @@ void displayGPS_speed(void)
   if(!GPS_fix)
     return;
 
-  screenBuffer[0] = speedUnitAdd[Settings[S_UNITSYSTEM]];
+  screenBuffer[0] = Settings[S_UNITSYSTEM] ? SYM_MPH : SYM_KMH;
   itoa(CMsToKMh(GPS_speed), screenBuffer+1, 10);
   MAX7456_WriteString(screenBuffer,getPosition(speedPosition));
 }
@@ -464,7 +460,7 @@ void displayAltitude(void)
   if(armed && onTime > 5 && altitude > altitudeMAX)
     altitudeMAX = altitude;
 
-  screenBuffer[0]=MwAltitudeAdd[Settings[S_UNITSYSTEM]];
+  screenBuffer[0]=Settings[S_UNITSYSTEM] ? SYM_ALTFT : SYM_ALTM;
   itoa(altitude,screenBuffer+1,10);
   MAX7456_WriteString(screenBuffer,getPosition(MwAltitudePosition));
 }
@@ -482,7 +478,7 @@ void displayClimbRate(void)
   else if(MwVario < -20) screenBuffer[0] = SYM_NEG_CLIMB;
   else                   screenBuffer[0] = SYM_ZERO_CLIMB;
 
-  screenBuffer[1] = MwClimbRateAdd[Settings[S_UNITSYSTEM]];
+  screenBuffer[1] = Settings[S_UNITSYSTEM] ? SYM_FTS : SYM_MS;
   int16_t vario;
   if(Settings[S_UNITSYSTEM])
     vario = MwVario * 0.032808;       // cm/sec ----> ft/sec
@@ -507,7 +503,7 @@ void displayDistanceToHome(void)
   if(dist > distanceMAX)
     distanceMAX = dist;
 
-  screenBuffer[0] = GPS_distanceToHomeAdd[Settings[S_UNITSYSTEM]];
+  screenBuffer[0] = Settings[S_UNITSYSTEM] ? SYM_DISTHOME_FT : SYM_DISTHOME_FT;
   itoa(dist, screenBuffer+1, 10);
   MAX7456_WriteString(screenBuffer,getPosition(GPS_distanceToHomePosition));
 }

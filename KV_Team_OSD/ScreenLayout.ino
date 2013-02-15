@@ -30,8 +30,8 @@ const uint16_t screenPosition[] PROGMEM = {
   POS(LINE10+15, 2, DISPLAY_CONDR),  // MwGPSLonPosition
   POS(LINE12+2,  2, DISPLAY_ALWAYS), // rssiPosition
   POS(LINE11+2,  0, DISPLAY_ALWAYS), // temperaturePosition
-  POS(LINE13+3,  2, DISPLAY_ALWAYS), // voltagePosition
-  POS(LINE11+3,  2, DISPLAY_ALWAYS), // vidvoltagePosition
+  POS(LINE13+2,  2, DISPLAY_ALWAYS), // voltagePosition
+  POS(LINE11+2,  2, DISPLAY_ALWAYS), // vidvoltagePosition
   POS(LINE13+10, 2, DISPLAY_ALWAYS), // amperagePosition
   POS(LINE13+16, 2, DISPLAY_ALWAYS), // pMeterSumPosition
   POS(LINE05+8,  1, DISPLAY_CONDR),  // horizonPosition

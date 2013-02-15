@@ -15,22 +15,22 @@
 #define SYM_DEGREES 0X8C
 
 // Direction arrows 
-#define SYM_ARROW_SOUTH 0X90
-#define SYM_ARROW_2 0X91
-#define SYM_ARROW_3 0X92
-#define SYM_ARROW_4 0X93
-#define SYM_ARROW_EAST 0X94
-#define SYM_ARROW_6 0X95
-#define SYM_ARROW_7 0X96
-#define SYM_ARROW_8 0X97
-#define SYM_ARROW_NORTH 0X98
-#define SYM_ARROW_10 0X99
-#define SYM_ARROW_11 0X9A
-#define SYM_ARROW_12 0X9B
-#define SYM_ARROW_WEST 0X9C
-#define SYM_ARROW_14 0X9D
-#define SYM_ARROW_15 0X9E
-#define SYM_ARROW_16 0X9F
+#define SYM_ARROW_SOUTH 0XC0
+#define SYM_ARROW_2 0XC1
+#define SYM_ARROW_3 0XC2
+#define SYM_ARROW_4 0XC3
+#define SYM_ARROW_EAST 0XC4
+#define SYM_ARROW_6 0XC5
+#define SYM_ARROW_7 0XC6
+#define SYM_ARROW_8 0XC7
+#define SYM_ARROW_NORTH 0XC8
+#define SYM_ARROW_10 0XC9
+#define SYM_ARROW_11 0XCA
+#define SYM_ARROW_12 0XCB
+#define SYM_ARROW_WEST 0XCC
+#define SYM_ARROW_14 0XCD
+#define SYM_ARROW_15 0XCE
+#define SYM_ARROW_16 0XCF
 
 // Heading Graphics
 #define SYM_HEADING_N 0X18 
@@ -98,17 +98,17 @@
 #define SYM_TEMP_F 0X0F
 
 // Batt evolution
-#define SYM_BATT_FULL 0X90
-#define SYM_BATT_5 0X91
-#define SYM_BATT_4 0X92
-#define SYM_BATT_3 0X93
-#define SYM_BATT_2 0X94
-#define SYM_BATT_1 0X95
-#define SYM_BATT_EMPTY 0X96
+#define SYM_BATT_FULL 0X80
+#define SYM_BATT_5 0X81
+#define SYM_BATT_4 0X82
+#define SYM_BATT_3 0X83
+#define SYM_BATT_2 0X84
+#define SYM_BATT_1 0X85
+#define SYM_BATT_EMPTY 0X86
 
 // Batt Icon´s
-#define SYM_MAIN_BATT 0X97
-#define SYM_VID_BAT 0X98
+#define SYM_MAIN_BATT 0X87
+#define SYM_VID_BAT 0X88
 
 // Unit Icon´s (Metric)
 #define SYM_MS 0X06
@@ -136,17 +136,16 @@
 #define SYM_TARGET_LOCK1 0XFF
 
 // Time
-#define SYM_ON_M 0X9B
-#define SYM_FLY_M 0X9C
-#define SYM_ON_H 0X70
-#define SYM_FLY_H 0X71
+#define SYM_ON_M 0X12
+#define SYM_FLY_M 0X13
+#define SYM_ON_H 0X10
+#define SYM_FLY_H 0X11
 
 // Throttle Position (%)
-#define SYM_THR 0XC8
-#define SYM_THR1 0XC9
+#define SYM_THR 0X8E
 
 // RSSI
-#define SYM_RSSI 0XBA
+#define SYM_RSSI 0X8D
 
 // Menu cursor
 #define SYM_CURSOR SYM_AH_LEFT
