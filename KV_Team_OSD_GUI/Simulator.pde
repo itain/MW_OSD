@@ -383,31 +383,31 @@ void displayMode()
   int SimModebits = 0;
   int SimBitCounter = 1;
     for (int i=0; i<boxnames.length; i++) {
-      if(toggleModeItems[i].getValue() > 0) SimModebits |= SimBitCounter;
-      SimBitCounter += SimBitCounter;
-}
+      if(toggleModeItems[i].getValue() > 0)
+        SimModebits |= SimBitCounter;
+      SimBitCounter <<= 1;
+    }
     if((SimModebits&mode_armed) >0){
-    makeText("ARMED", motorArmedPosition[0]);
-  }
+      makeText(" ARMED", motorArmedPosition[0]);
+    }
     else{
-    makeText("DISARMED", motorArmedPosition[0]);
-  }
-    
+      makeText("UNARMED", motorArmedPosition[0]);
+    }
+
     if((SimModebits&mode_stable) >0)
-      mapchar(0xbe,sensorPosition[0]+LINE);
+      mapchar(SYM_CHECK, sensorPosition[0]+LINE);
 
     if((SimModebits&mode_baro) >0)
-      mapchar(0xbe,sensorPosition[0]+1+LINE);
+      mapchar(SYM_CHECK, sensorPosition[0]+1+LINE);
 
     if((SimModebits&mode_mag) >0)
-      mapchar(0xbe,sensorPosition[0]+2+LINE);
+      mapchar(SYM_CHECK, sensorPosition[0]+2+LINE);
 
     if((SimModebits&mode_gpshome) >0)
-      mapchar(0xbe,sensorPosition[0]+3+LINE);
+      mapchar(SYM_CHECK, sensorPosition[0]+3+LINE);
 
     if((SimModebits&mode_gpshold) >0)
-      mapchar(0xbe,sensorPosition[0]+3+LINE);
-
+      mapchar(SYM_CHECK, sensorPosition[0]+3+LINE);
 }
 
 
@@ -426,33 +426,33 @@ void displayHorizon(int rollAngle, int pitchAngle)
     if(Y >= 0 && Y <= 81) {
       int pos = 30*(2+Y/9) + 10 + X;
       if(X < 3 || X >5 || (Y/9) != 4 || confItem[GetSetting("S_DISPLAY_HORIZON_BR")].value() == 0)
-      	mapchar(0x80+(Y%9), pos);
+      	mapchar(SYM_AH_BAR9_0+(Y%9), pos);
       if(Y>=9 && (Y%9) == 0)
-        mapchar(0x89, pos-30);
+        mapchar(SYM_AH_BAR9_9, pos-30);
     }
   }
 
   if(confItem[GetSetting("S_DISPLAY_HORIZON_BR")].value() > 0) {
     //Draw center screen
-    mapchar(0x01, 224-30);
-    mapchar(0x00, 224-30-1);
-    mapchar(0x00, 224-30+1);
+    mapchar(SYM_AH_CENTER, 224-30);
+    mapchar(SYM_AH_CENTER_LINE, 224-30-1);
+    mapchar(SYM_AH_CENTER_LINE, 224-30+1);
   }
   
   //if (WITHDECORATION){
   if(confItem[GetSetting("S_WITHDECORATION")].value() > 0) {
-    mapchar(0xC7,128);
-    mapchar(0xC7,128+30);
-    mapchar(0xC7,128+60);
-    mapchar(0xC7,128+90);
-    mapchar(0xC7,128+120);
-    mapchar(0xC6,128+12);
-    mapchar(0xC6,128+12+30);
-    mapchar(0xC6,128+12+60);
-    mapchar(0xC6,128+12+90);
-    mapchar(0xC6,128+12+120);
-    mapchar(0x02, 229-30);
-    mapchar(0x03, 219-30);
+    mapchar(SYM_AH_DECORATION_LEFT,128);
+    mapchar(SYM_AH_DECORATION_LEFT,128+30);
+    mapchar(SYM_AH_DECORATION_LEFT,128+60);
+    mapchar(SYM_AH_DECORATION_LEFT,128+90);
+    mapchar(SYM_AH_DECORATION_LEFT,128+120);
+    mapchar(SYM_AH_DECORATION_RIGHT,128+12);
+    mapchar(SYM_AH_DECORATION_RIGHT,128+12+30);
+    mapchar(SYM_AH_DECORATION_RIGHT,128+12+60);
+    mapchar(SYM_AH_DECORATION_RIGHT,128+12+90);
+    mapchar(SYM_AH_DECORATION_RIGHT,128+12+120);
+    mapchar(SYM_AH_LEFT, 229-30);
+    mapchar(SYM_AH_RIGHT, 219-30);
   }
 }
 
@@ -495,7 +495,7 @@ void displayHeading()
   case 3:
     makeText(str(heading), MwHeadingPosition[0]);
   }
-  mapchar(MwHeadingUnitAdd,MwHeadingPosition[0]+3);  
+  mapchar(SYM_DEGREES, MwHeadingPosition[0]+3);  
 }
 
 void ControlLock(){

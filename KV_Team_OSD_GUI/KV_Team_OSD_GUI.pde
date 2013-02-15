@@ -396,16 +396,19 @@ String[] SimNames= {
 
 PFont font8,font9,font10,font11,font12,font15;
 
-//Colors--------------------------------------------------------------------------------------------------------------------
-color yellow_ = color(200, 200, 20), green_ = color(30, 120, 30), red_ = color(120, 30, 30), blue_ = color(50, 50, 100),
-grey_ = color(30, 30, 30);
-//Colors--------------------------------------------------------------------------------------------------------------------
+// Colors
+color yellow_ = color(200, 200, 20),
+      green_ = color(30, 120, 30),
+      red_ = color(120, 30, 30),
+      blue_ = color(50, 50, 100),
+      grey_ = color(30, 30, 30);
+//Colors
 
-// textlabels -------------------------------------------------------------------------------------------------------------
+// textlabels
 Textlabel txtlblconfItem[] = new Textlabel[CONFIGITEMS] ;
 Textlabel txtlblSimItem[] = new Textlabel[SIMITEMS] ;
 Textlabel FileUploadText;
-// textlabels -------------------------------------------------------------------------------------------------------------
+// textlabels
 
 // Buttons------------------------------------------------------------------------------------------------------------------
 Button buttonIMPORT,buttonSAVE,buttonREAD,buttonRESET,buttonWRITE,buttonRESTART;
@@ -944,10 +947,10 @@ void makeText(String inString, int inStartAddress ){
 
 void displaySensors()
 {
-   mapchar(0xa0,sensorPosition[0]);
-   mapchar(0xa2,sensorPosition[0]+1);
-   mapchar(0xa1,sensorPosition[0]+2);
-   mapchar(0xa3,sensorPosition[0]+3);
+   mapchar(SYM_ACC, sensorPosition[0]);
+   mapchar(SYM_MAG, sensorPosition[0]+1);
+   mapchar(SYM_BAR, sensorPosition[0]+2);
+   mapchar(SYM_SON, sensorPosition[0]+3);
    /* 
   if(MwSensorPresent&ACCELEROMETER) mapchar("0xa0",sensorPosition[0]);
   else ;
@@ -969,32 +972,32 @@ void displaySensors()
 void ShowVolts(float voltage){
   
 String output = OnePlaceDecimal.format(voltage);
-  mapchar(0x97, voltagePosition[ScreenType]);
+  mapchar(SYM_MAIN_BATT, voltagePosition[ScreenType]);
   makeText(output, voltagePosition[ScreenType]+2);
 }
 
 void ShowFlyTime(String FMinutes_Seconds){
-  mapchar(0x9c, flyTimePosition[ScreenType]);
+  mapchar(SYM_FLY_M, flyTimePosition[ScreenType]);
   makeText(FMinutes_Seconds, flyTimePosition[ScreenType]+1);
 }
 
 void ShowOnTime(String Minutes_Seconds){
-  mapchar(0x9b, onTimePosition[ScreenType]);
+  mapchar(SYM_ON_M, onTimePosition[ScreenType]);
   makeText(Minutes_Seconds, onTimePosition[ScreenType]+1);
 }
 
 void ShowCurrentThrottlePosition(){
-  mapchar(0xc8, CurrentThrottlePosition[ScreenType]);
+  mapchar(SYM_THR, CurrentThrottlePosition[ScreenType]);
   makeText(" 40%", CurrentThrottlePosition[ScreenType]+1);
 }
 
 void ShowRSSI(){
-  mapchar(0xba, rssiPosition[ScreenType]);
+  mapchar(SYM_RSSI, rssiPosition[ScreenType]);
   makeText("93%", rssiPosition[ScreenType]+1);
 }
 
 void ShowAmperage(){
-  mapchar(0xa4, amperagePosition[ScreenType]);
+  mapchar(SYM_MAH, amperagePosition[ScreenType]);
   makeText("2306", amperagePosition[ScreenType]+1);
 }
 
