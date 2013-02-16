@@ -373,7 +373,6 @@ void loop()
   }
 
   serialMSPreceive();
-
 }  // End of main loop
 //---------------------  End of Timed Service Routine ---------------------------------------
 
@@ -404,8 +403,8 @@ void calculateRssi(void)
   }
   else
   {
-    aa =analogRead(rssiPin)/4; 
- }   
+    aa = analogRead(rssiPin)/4; 
+  }   
   aa = ((aa-Settings[S_RSSIMIN]) *101)/(Settings[S_RSSIMAX]-Settings[S_RSSIMIN]) ;
   rssi_Int += ( ( (signed int)((aa*rssiSample) - rssi_Int )) / rssiSample );
   rssi = rssi_Int / rssiSample ;
@@ -448,35 +447,35 @@ void initFontMode() {
   if(armed || configMode || fontMode|| !safeMode()) 
     return;
 
-  for(int i = 0; i < 32; i++)
-     needFontUpdate[i] = 0xff;
-
+/*
+  lastCharReceived = nextCharToRequest - 1;
+*/
   fontMode = 1;
-  nextCharToRequest = 0;
   setMspRequests();
 }
 
-void findNextCharToRequest() {
+
+void fontCharacterReceived(uint8_t cindex) {
   if(!fontMode)
     return;
 
-  for(int i = 0; i < 32; i++) {
-     uint8_t v = needFontUpdate[i];
-     if(v == 0)
-       continue;
-     for(uint8_t j = 0; j < 8; j++) {
-       if(needFontUpdate[i] & (1<<j)) {
-         nextCharToRequest = i * 8 + j;
-         return;
-       }
-     }
-  }
-  // Nothing to request,
-  fontMode = 0;
-  MAX7456Setup();
-  setMspRequests();
-}
+/*
+  uint8_t delta = cindex = lastCharReceived;
+  if(delta == 1) {
+    lastCharReceived = cindex;
+    delta = 0;
+  } 
+*/
 
-void fontCharReceived(uint8_t c) {
-  needFontUpdate[c/8] &= ~(1<< (c & 7));
+  if(cindex == nextCharToRequest) { // Is it the last one requested?
+    write_NVM(cindex);
+
+    if(nextCharToRequest != lastCharToRequest)
+      ++nextCharToRequest;
+    else {
+      // Nothing to request,
+      fontMode = 0;
+      setMspRequests();
+    }
+  }
 }

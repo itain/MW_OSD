@@ -245,6 +245,7 @@ void MAX7456Configure() {
     MAX7456RESET = 10;       // RESET
   }
 }
+
 #define WRITE_TO_MAX7456
 #define NVM_ram_size 54
 #define WRITE_nvr 0xa0

@@ -62,19 +62,20 @@ void serialMSPCheck()
     }
 
     if(cmd == OSD_GET_FONT) {
-      if(dataSize == 3) {
-        if(read16() == 7456)
+      if(dataSize == 5) {
+        if(read16() == 7456) {
+          nextCharToRequest = read8();
+          lastCharToRequest = read8();
           initFontMode();
+        }
       }
       else if(dataSize == 56) {
         for(uint8_t i = 0; i < 54; i++)
           fontData[i] = read8();
       
 	uint8_t c = read8();
-	if(needFontUpdate[c/8]&(1<< (c & 7))) // Write only once
-	  write_NVM(c);
-	fontCharReceived(c);
-	findNextCharToRequest();
+
+	fontCharacterReceived(c);
       }
     }
   }

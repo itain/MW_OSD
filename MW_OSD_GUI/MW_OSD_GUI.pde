@@ -1,5 +1,5 @@
 
-//   KV Team OSD GUI
+//   MW_OSD GUI
 //   http://code.google.com/p/rush-osd-development/
 //   February  2013  V2.01b
 //   This program is free software: you can redistribute it and/or modify
@@ -7,23 +7,14 @@
 //   the Free Software Foundation, either version 3 of the License, or
 //   any later version. see http://www.gnu.org/licenses/
 
-              /***********************************************************************************************************************************************/
-              /*                                                            KV_OSD_Team_GUI                                                                  */
-              /*                                                                                                                                             */
-              /*                                                                                                                                             */
-              /*                                             This software is the result of a team work                                                      */
-              /*                                                                                                                                             */
-              /*                           POWER67             KATAVENTOS               ITAIN                    CARLONB                                     */
-              /*                                                                                                                                             */
-              /*                                                                                                                                             */
-              /*                                                                                                                                             */
-              /*                                                                                                                                             */
-              /*                                                                                                                                             */
-              /***********************************************************************************************************************************************/
-
-
- 
-
+/*****************************************************************/
+/*                            KV_OSD_Team_GUI                    */
+/*                                                               */
+/*        This software is the result of a team work             */
+/*                                                               */
+/*   POWER67     KATAVENTOS          ITAIN           CARLONB     */
+/*                                                               */
+/*****************************************************************/
 
 
 import processing.serial.Serial; // serial library
@@ -37,12 +28,12 @@ import javax.swing.JOptionPane; // for message dialogue
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.InputStream;
-import java.io.OutputStream; 
+import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.util.*;
 import java.io.FileNotFoundException;
-import java.text.DecimalFormat; 
+import java.text.DecimalFormat;
 
 //added new imports to support proccessing 2.0b7
 
@@ -85,7 +76,7 @@ int[] GPS_directionToHomePosition=    {
 
 int[] GPS_distanceToHomePosition=  {
   LINE02+22  ,LINE02+24 };
-int[] speedPosition = {     
+int[] speedPosition = {
   LINE03+22 ,LINE03+24};  // [0] En Km/h   [1] En Mph
 int[] GPS_angleToHomePosition=  {
   LINE04+14 ,LINE04+14};
@@ -127,7 +118,7 @@ int[] amperagePosition =     {
   LINE13+10,LINE13+10+60};
 int[] pMeterSumPosition =       {
   LINE13+16,LINE13+16+60};
-  
+
 int DisplayWindowX = 635; //380;//380;
 int DisplayWindowY = 10; //10;
 int WindowAdjX = 15;
@@ -136,7 +127,7 @@ int WindowShrinkX = 20;
 int WindowShrinkY = 50;
 
 int currentCol = 0;
-int currentRow = 0;  
+int currentRow = 0;
 //Boolean SimulateMW = true;
 
 
@@ -145,7 +136,7 @@ ControlP5 SmallcontrolP5;
 ControlP5 ScontrolP5;
 ControlP5 FontGroupcontrolP5;
 ControlP5 GroupcontrolP5;
-Textlabel txtlblWhichcom; 
+Textlabel txtlblWhichcom;
 ListBox commListbox;
 
 char serialBuffer[] = new char[128]; // this hold the imcoming string from serial O string
@@ -153,7 +144,7 @@ String TestString = "";
 String SendCommand = "";
 
 
-boolean firstContact = false;   
+boolean firstContact = false;
 boolean disableSerial = false;
 
 boolean PortRead = true;
@@ -236,34 +227,34 @@ char MwHeadingUnitAdd=0xbd;
 
 String[] ConfigNames = {
   "EEPROM Loaded",
-  
+
   "RSSI Min",
   "RSSI Max",
   "Display RSSI",
-  
+
   "Display Voltage",
   "Voltage Min",
   "Battery Cells",
   "Main Voltage Devider",
   "Main Voltage MW",
-  
+
   "Display Amperage",
   "Diplay Amperage Used",
-  
+
   "Display Video Voltage",
   "Video Voltage Devider",
   "Video Voltage MW",
-  
+
   "Display Temperature",
   "Temperature Max",
-  
+
   "",
-  
+
   "Display GPS",
   "Display GPS Coords",
   "Display Heading",
   "Display Heading 360",
-  
+
   "Units",
   "Video Signal",
   "Display Thottle Position",
@@ -273,39 +264,39 @@ String[] ConfigNames = {
   "Reset Stats After Arm",
   "Enable OSD Read ADC",
   "RSSI Over MW"
-  
+
 
 };
 String[] ConfigHelp = {
   "EEPROM Loaded:",
-  
+
   "RSSI Min:",
   "RSSI Max:",
   "Display RSSI:",
-  
+
   "Display Voltage:",
   "Voltage Min:",
   "Battery Cells",
   "Main Voltage Devider:",
   "Main Voltage MW:",
-  
+
   "Display Amperage:",
   "Diplay Amperage Used:",
-  
+
   "Display Video Voltage:",
   "Video Voltage Devider:",
   "Video Voltage MW:",
-  
+
   "Display Temperature:",
   "Temperature Max:",
-  
+
   "Board Type:",
-  
+
   "Display GPS:",
   "Display GPS Coords:",
   "Display Heading:",
   "Display Heading 360:",
-  
+
   "Unit System:",
   "Screen Type NTSC / PAL:",
   "Display Thottle Position",
@@ -315,7 +306,7 @@ String[] ConfigHelp = {
   "Reset Stats After Arm:",
   "Enable OSD Read ADC:",
   "RSSI Over MW:"
-  
+
   };
 
 
@@ -324,7 +315,7 @@ String[] ConfigHelp = {
 static int CHECKBOXITEMS=0;
 int CONFIGITEMS=ConfigNames.length;
 static int SIMITEMS=6;
-  
+
 int[] ConfigRanges = {
 1,   // used for check             0
 
@@ -342,7 +333,7 @@ int[] ConfigRanges = {
 1,     // S_AMPER_HOUR,
 
 1,     // S_VIDVOLTAGE             15
-255,   // S_VIDDIVIDERRATIO        16    
+255,   // S_VIDDIVIDERRATIO        16
 1,     // S_VIDVOLTAGE_VBAT        17
 
 1,     // S_DISPLAYTEMPERATURE     18
@@ -352,7 +343,7 @@ int[] ConfigRanges = {
 
 1,     // S_DISPLAYGPS             21
 1,     // S_COORDINATES            22
-1,     // S_SHOWHEADING            28 
+1,     // S_SHOWHEADING            28
 1,     // S_HEADING360             29
 
 1,     // S_UNITSYSTEM             23
@@ -360,7 +351,7 @@ int[] ConfigRanges = {
 1,     // S_THROTTLEPOSITION       25
 1,     // S_DISPLAY_HORIZON_BR     26
 1,     // S_WITHDECORATION         27
-1,     // S_SHOWBATLEVELEVOLUTION  30 
+1,     // S_SHOWBATLEVELEVOLUTION  30
 1,     // S_RESETSTATISTICS        31
 1,     // S_ENABLEADC              32
 1      // S_MWRSSI                 33
@@ -378,8 +369,8 @@ String[] SimNames= {
   "Sim 9:",
   "Sim 10:"
 };
-  
-  
+
+
   int[] SimRanges = {
   1,
   1,
@@ -416,13 +407,13 @@ Button buttonIMPORT,buttonSAVE,buttonREAD,buttonRESET,buttonWRITE,buttonRESTART;
 
 // Toggles------------------------------------------------------------------------------------------------------------------
 Toggle toggleConfItem[] = new Toggle[CONFIGITEMS] ;
-// Toggles------------------------------------------------------------------------------------------------------------------    
+// Toggles------------------------------------------------------------------------------------------------------------------
 
 // checkboxes------------------------------------------------------------------------------------------------------------------
 CheckBox checkboxConfItem[] = new CheckBox[CONFIGITEMS] ;
 
 
-// Toggles------------------------------------------------------------------------------------------------------------------    
+// Toggles------------------------------------------------------------------------------------------------------------------
 RadioButton RadioButtonConfItem[] = new RadioButton[CONFIGITEMS] ;
 RadioButton R_PortStat;
 
@@ -458,10 +449,10 @@ controlP5.Controller hideLabel(controlP5.Controller c) {
 
 void setup() {
   size(windowsX,windowsY);
- 
+
 //Map<Settings, String> table = new EnumMap<Settings>(Settings.class);
 OnTimer = millis();
-  frameRate(10); 
+  frameRate(10);
 OSDBackground = loadImage("Background.jpg");
 RadioPot = loadImage("Radio_Pot.png");
 
@@ -475,22 +466,22 @@ RadioPot = loadImage("Radio_Pot.png");
   controlP5 = new ControlP5(this); // initialize the GUI controls
   controlP5.setControlFont(font10);
   controlP5.setAutoDraw(false);
-  
+
 
   SmallcontrolP5 = new ControlP5(this); // initialize the GUI controls
-  SmallcontrolP5.setControlFont(font9); 
-  SmallcontrolP5.setAutoDraw(false); 
- 
+  SmallcontrolP5.setControlFont(font9);
+  SmallcontrolP5.setAutoDraw(false);
+
   ScontrolP5 = new ControlP5(this); // initialize the GUI controls
-  ScontrolP5.setControlFont(font10);  
-  ScontrolP5.setAutoDraw(false);  
- 
- 
+  ScontrolP5.setControlFont(font10);
+  ScontrolP5.setAutoDraw(false);
+
+
  FontGroupcontrolP5 = new ControlP5(this); // initialize the GUI controls
  FontGroupcontrolP5.setControlFont(font10);
- FontGroupcontrolP5.setAutoDraw(false); 
- 
- 
+ FontGroupcontrolP5.setAutoDraw(false);
+
+
   GroupcontrolP5 = new ControlP5(this); // initialize the GUI controls
   GroupcontrolP5.setControlFont(font10);
   GroupcontrolP5.setColorForeground(color(30,255));
@@ -499,7 +490,7 @@ RadioPot = loadImage("Radio_Pot.png");
   GroupcontrolP5.setColorValue(0xffff88ff);
   GroupcontrolP5.setColorActive(color(30,255));
   GroupcontrolP5.setAutoDraw(false);
-  
+
 
   SetupGroups();
 
@@ -520,10 +511,10 @@ RadioPot = loadImage("Radio_Pot.png");
   commListbox.addItem("Close Comm",++commListMax); // addItem(name,value)
   // text label for which comm port selected
   txtlblWhichcom = controlP5.addTextlabel("txtlblWhichcom","No Port Selected",5,65); // textlabel(name,text,x,y)
-  
+
   buttonSAVE = controlP5.addButton("bSAVE",1,5,45,40,19); buttonSAVE.setLabel("SAVE"); buttonSAVE.setColorBackground(red_);
-  buttonIMPORT = controlP5.addButton("bIMPORT",1,50,45,40,19); buttonIMPORT.setLabel("LOAD"); buttonIMPORT.setColorBackground(red_); 
-  
+  buttonIMPORT = controlP5.addButton("bIMPORT",1,50,45,40,19); buttonIMPORT.setLabel("LOAD"); buttonIMPORT.setColorBackground(red_);
+
   buttonREAD = controlP5.addButton("READ",1,XControlBox+30,YControlBox+25,45,16);buttonREAD.setColorBackground(red_);
   buttonRESET = controlP5.addButton("RESET",1,XControlBox+30,YControlBox+50,45,16);buttonRESET.setColorBackground(red_);
   buttonWRITE = controlP5.addButton("WRITE",1,XControlBox+30,YControlBox+75,45,16);buttonWRITE.setColorBackground(red_);
@@ -591,7 +582,7 @@ CreateItem(GetSetting("S_MWRSSI"),  5,8*17, G_Other);
 
 
 
-       
+
   // CheckBox "Hide Background"
   ShowSimBackground = controlP5.addCheckBox("ShowSimBackground",XSim+50,YSim);
   ShowSimBackground.setColorActive(color(255));
@@ -609,24 +600,17 @@ CreateItem(GetSetting("S_MWRSSI"),  5,8*17, G_Other);
     if (ConfigRanges[i] > 1) {
       toggleConfItem[i].hide();
     }
-      
+
     if (ConfigRanges[i] == 1){
-      confItem[i].hide();  
+      confItem[i].hide();
     }
   }
-  
-  
-  
-
-  
-  
 
   BuildToolHelp();
   Font_Editor_setup();
-   SimSetup();
-  img_Clear = LoadFont("MW_OSD_Team.mcm");
+  SimSetup();
+  img_Clear = LoadFont("MW_OSD.mcm");
 }
-
 
 controlP5.Controller hideCheckbox(controlP5.Controller c) {
   c.hide();
@@ -635,20 +619,18 @@ controlP5.Controller hideCheckbox(controlP5.Controller c) {
 }
 
 controlP5.Controller CheckboxVisable(controlP5.Controller c) {
-  c.isVisible(); 
+  c.isVisible();
 
   //c.setLabelVisible(false);
   return c;
 }
 
-
-
 void BuildRadioButton(int ItemIndex, int XLoction, int YLocation,Group inGroup, String Cap1, String Cap2){
-    
+
   RadioButtonConfItem[ItemIndex] = controlP5.addRadioButton("RadioButton"+ItemIndex)
          .setPosition(XLoction,YLocation+3)
          .setSize(10,10)
-         .setNoneSelectedAllowed(false) 
+         .setNoneSelectedAllowed(false)
          //.setColorBackground(color(120))
          //.setColorActive(color(255))
         // .setColorLabel(color(255))
@@ -657,18 +639,17 @@ void BuildRadioButton(int ItemIndex, int XLoction, int YLocation,Group inGroup, 
          .addItem("First"+ItemIndex,0)
          .addItem("Second"+ItemIndex,1)
          .toUpperCase(false)
-        //.hideLabels() 
+        //.hideLabels()
          ;
     RadioButtonConfItem[ItemIndex].setGroup(inGroup);
     RadioButtonConfItem[ItemIndex].getItem(0).setCaptionLabel(Cap1);
     RadioButtonConfItem[ItemIndex].getItem(1).setCaptionLabel(Cap2 + "    " + ConfigNames[ItemIndex]);
-    
+
     toggleConfItem[ItemIndex].hide();
     txtlblconfItem[ItemIndex].hide();
-    
-  
-}
 
+
+}
 
 void CreateItem(int ItemIndex, int XLoction, int YLocation, Group inGroup){
   //numberbox
@@ -690,7 +671,7 @@ void CreateItem(int ItemIndex, int XLoction, int YLocation, Group inGroup){
   txtlblconfItem[ItemIndex].setGroup(inGroup);
   //controlP5.getTooltip().register("txtlblconfItem"+ItemIndex,ConfigHelp[ItemIndex]);
 
-} 
+}
 
 
 void BuildToolHelp(){
@@ -700,34 +681,34 @@ void BuildToolHelp(){
   //controlP5.getTooltip().register("s2","Changes the Background");
 }
 
-
-
 void BounceSerial(){
   toggleMSP_Data = false;
   InitSerial(200.00);
   InitSerial(LastPort);
   toggleMSP_Data = true;
   delay(1000);
-  
-}  
+
+}
 
 void RESTART(){
   BounceSerial();
-}  
-
+}
 
 public void RESET(){
   MessageText.setValue("Reset OSD to Default Settings?");
-  //messageBox.bringToFront(); 
+  //messageBox.bringToFront();
   messageBox.show();
-  
+
 }
 
 void MakePorts(){
-  
   //time=millis();
   strokeWeight(3);stroke(100);
-  fill(100); strokeWeight(3);stroke(200); rectMode(CORNERS); rect(XPortStat,YPortStat, XPortStat+105 , YPortStat+30);
+  fill(100);
+  strokeWeight(3);
+  stroke(200);
+  rectMode(CORNERS);
+  rect(XPortStat,YPortStat, XPortStat+105 , YPortStat+30);
   if ((PortRead) && (time - time2 >200)){
     time2 = time;
     fill(255, 10, 0);
@@ -745,33 +726,37 @@ void MakePorts(){
   {
    fill(0,100, 0);
   }
-   
+
   ellipse(XPortStat+ 65, YPortStat+15, 10, 10);
-  
+
 }
 
 void draw() {
   time=millis();
   hint(ENABLE_DEPTH_TEST);
   pushMatrix();
- PortRead = false; 
- PortWrite = false; 
+  PortRead = false;
+  PortWrite = false;
   if ((init_com==1)  && (toggleMSP_Data == true)) MWData_Com();
-  
-  
+
   background(80);
-  
+
   // ------------------------------------------------------------------------
   // Draw background control boxes
   // ------------------------------------------------------------------------
 
   // Coltrol Box
-  fill(100); strokeWeight(3);stroke(200); rectMode(CORNERS); rect(XControlBox,YControlBox, XControlBox+105 , YControlBox+120);
-  textFont(font12); fill(255, 255, 255); text("OSD Controls",XControlBox + 15,YControlBox + 15);
+  fill(100);
+  strokeWeight(3);stroke(200);
+  rectMode(CORNERS);
+  rect(XControlBox,YControlBox, XControlBox+105 , YControlBox+120);
+  textFont(font12);
+  fill(255, 255, 255);
+  text("OSD Controls",XControlBox + 15,YControlBox + 15);
   if (activeTab == 1) {
-  
+
   }
-  
+
   fill(40, 40, 40);
   strokeWeight(3);stroke(0);
   rectMode(CORNERS);
@@ -792,29 +777,26 @@ void draw() {
     fill(80, 80,80); strokeWeight(3);stroke(1); rectMode(CORNER); rect(DisplayWindowX+WindowAdjX, DisplayWindowY+WindowAdjY, 360-WindowShrinkX, 288-WindowShrinkY);
   }
 
-
- 
-
   displayHorizon(int(MW_Pitch_Roll.arrayValue()[0])*10,int(MW_Pitch_Roll.arrayValue()[1])*10*-1);
   SimulateTimer();
   ShowCurrentThrottlePosition();
   if (int(confItem[GetSetting("S_DISPLAYRSSI")].value()) > 0)
-    ShowRSSI(); 
+    ShowRSSI();
   if (int(confItem[GetSetting("S_DISPLAYVOLTAGE")].value()) > 0) {
      ShowVolts(sVBat);
   }
-    
- 
-  CalcAlt_Vario(); 
+
+
+  CalcAlt_Vario();
   displaySensors();
   displayMode();
   ShowAmperage();
   displayHeadingGraph();
   displayHeading();
-  
-  
+
+
   MakePorts();
-  
+
   GroupcontrolP5.draw();
   controlP5.draw();
   ScontrolP5.draw();
@@ -827,68 +809,62 @@ void draw() {
 }
 
 void CheckMessageBox(){
-  
-  if (messageBoxResult == 1){
-  toggleConfItem[0].setValue(0);
-  confItem[0].setValue(0);
-  WRITE();
-  BounceSerial();
-  messageBoxResult = -1;
-  }
-  
-}
 
+  if (messageBoxResult == 1){
+    toggleConfItem[0].setValue(0);
+    confItem[0].setValue(0);
+    WRITE();
+    BounceSerial();
+    messageBoxResult = -1;
+  }
+
+}
 
 int GetSetting(String test){
   int TheSetting = 0;
-  for (int i=0; i<Settings.values().length; i++) 
-  if (Settings.valueOf(test) == Settings.values()[i]){ 
+  for (int i=0; i<Settings.values().length; i++)
+  if (Settings.valueOf(test) == Settings.values()[i]){
       TheSetting = Settings.values()[i].ordinal();
   }
   return TheSetting;
 }
 
-
 void ShowSimBackground(float[] a) {
   Showback = int(a[0]);
 }
 
-//void SimulateMultiWii(float[] a) {
-//}
-
-
 void MatchConfigs(){
  for(int i=0;i<CONFIGITEMS;i++) {
-   try{ 
-       if (RadioButtonConfItem[i].isVisible()){
-          confItem[i].setValue(int(RadioButtonConfItem[i].getValue()));
-       }
-        }catch(Exception e) {}finally {}
-    
-   
-   if  (toggleConfItem[i].isVisible()){
+   try {
+     if (RadioButtonConfItem[i].isVisible()) {
+       confItem[i].setValue(int(RadioButtonConfItem[i].getValue()));
+     }
+   }
+   catch(Exception e) {
+   }
+   finally {}
+
+   if(toggleConfItem[i].isVisible()) {
      //confItem[i].setValue(int(checkboxConfItem[i].arrayValue()[0]));
-     if (int(toggleConfItem[i].getValue())== 1){
+     if (int(toggleConfItem[i].getValue())== 1) {
        confItem[i].setValue(1);
      }
-     else{ 
+     else {
        confItem[i].setValue(0);
      }
    }
-   if (ConfigRanges[i] == 0) {
+   if(ConfigRanges[i] == 0) {
       toggleConfItem[i].hide();
       //RadioButtonConfItem[i].hide();
       confItem[i].hide();
     }
     if (ConfigRanges[i] > 1) {
       toggleConfItem[i].hide();
-      
-    }  
-    if (ConfigRanges[i] == 1){
-      confItem[i].hide();  
+
     }
-    
-    
+    if (ConfigRanges[i] == 1){
+      confItem[i].hide();
+    }
   }
   // turn on FlyTimer----
   if ((toggleModeItems[0].getValue() == 0) && (SimItem0 < 1)){
@@ -899,9 +875,6 @@ void MatchConfigs(){
   if ((toggleModeItems[0].getValue() == 1 ) && (SimItem0 == 1)){
     FlyTimer = 0;
   }
-
-
-
 }
 
 // controls comport list click
@@ -909,26 +882,23 @@ public void controlEvent(ControlEvent theEvent) {
   if (theEvent.isGroup())
     if (theEvent.name()=="portComList")
       InitSerial(theEvent.group().value()); // initialize the serial port selected
-      
+
   try{
-  //for (int i=0;i<col.length;i++) {
-    if ((theEvent.getController().getName().substring(0, 7).equals("CharPix")) && (theEvent.getController().isMousePressed())) {
+    if((theEvent.getController().getName().substring(0, 7).equals("CharPix")) &&
+       (theEvent.getController().isMousePressed())) {
       //println("Got a pixel " + theEvent.controller().id());
         int ColorCheck = int(theEvent.getController().value());
         curPixel = theEvent.controller().id();
     }
-    if ((theEvent.getController().getName().substring(0, 7).equals("CharMap")) && (theEvent.getController().isMousePressed())) {
-      curChar = theEvent.controller().id();    
+    if((theEvent.getController().getName().substring(0, 7).equals("CharMap")) &&
+       (theEvent.getController().isMousePressed())) {
+      curChar = theEvent.controller().id();
       //println("Got a Char " + theEvent.controller().id());
     }
-   } catch(ClassCastException e){}
-     catch(StringIndexOutOfBoundsException se){}
-      
+  }
+  catch(ClassCastException e){}
+  catch(StringIndexOutOfBoundsException se){}
 }
-
-
-
-
 
 void mapchar(int address, int screenAddress){
   int placeX = (screenAddress % 30) * 12;
@@ -939,44 +909,25 @@ void mapchar(int address, int screenAddress){
 
 void makeText(String inString, int inStartAddress ){
   for (int i = 0; i < inString.length(); i++){
-    mapchar(int(inString.charAt(i)), inStartAddress +i); 
-  }   
+    mapchar(int(inString.charAt(i)), inStartAddress +i);
+  }
 }
-
-
 
 void displaySensors()
 {
    mapchar(SYM_ACC, sensorPosition[0]);
-   mapchar(SYM_MAG, sensorPosition[0]+1);
-   mapchar(SYM_BAR, sensorPosition[0]+2);
+   mapchar(SYM_BAR, sensorPosition[0]+1);
+   mapchar(SYM_MAG, sensorPosition[0]+2);
    mapchar(SYM_SON, sensorPosition[0]+3);
-   /* 
-  if(MwSensorPresent&ACCELEROMETER) mapchar("0xa0",sensorPosition[0]);
-  else ;
-  if(MwSensorPresent&BAROMETER)     screenBuffer[1]=0xa2;
-  else screenBuffer[1]=' ';
-  if(MwSensorPresent&MAGNETOMETER)  screenBuffer[2]=0xa1;
-  else screenBuffer[2]=' ';
-  if(MwSensorPresent&GPSSENSOR)     screenBuffer[3]=0xa3;
-  else screenBuffer[3]=' ';
-  screenBuffer[4]=0;
-  MAX7456_WriteString(screenBuffer,sensorPosition[videoSignalType][screenType]);
-  */
 }
 
-
-
-
-
-void ShowVolts(float voltage){
-  
-String output = OnePlaceDecimal.format(voltage);
+void ShowVolts(float voltage) {
+  String output = OnePlaceDecimal.format(voltage);
   mapchar(SYM_MAIN_BATT, voltagePosition[ScreenType]);
   makeText(output, voltagePosition[ScreenType]+2);
 }
 
-void ShowFlyTime(String FMinutes_Seconds){
+void ShowFlyTime(String FMinutes_Seconds) {
   mapchar(SYM_FLY_M, flyTimePosition[ScreenType]);
   makeText(FMinutes_Seconds, flyTimePosition[ScreenType]+1);
 }
@@ -1016,7 +967,7 @@ void SimulateTimer(){
   {
     OnTimerString = str(minutes) + ":" + str(seconds);
   }
-  
+
   ShowOnTime(OnTimerString);
 
   if (FlyTimer >0) {
@@ -1036,14 +987,11 @@ void SimulateTimer(){
   else
   {
     FlyTimerString = "0:00";
-  } 
+  }
    ShowFlyTime(FlyTimerString);
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////// BEGIN FILE OPS//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
+// BEGIN FILE OPS
 
 //save the content of the model to a file
 public void bSAVE() {
@@ -1085,7 +1033,7 @@ public void bSAVE() {
           file = new File(filePath + ".osd");
         }
 
-        
+
         FileOutputStream out =null;
         String error = null;
         try{
@@ -1093,14 +1041,14 @@ public void bSAVE() {
           MWI.conf.storeToXML(out, "RUSH_OSD Configuration File  " + new  Date().toString());
           JOptionPane.showMessageDialog(null,new StringBuffer().append("configuration saved : ").append(file.toURI()) );
         }catch(FileNotFoundException e){
-         
+
           error = e.getCause().toString();
         }catch( IOException ioe){
                 /*failed to write the file*/
                 ioe.printStackTrace();
                 error = ioe.getCause().toString();
         }finally{
-                
+
           if (out!=null){
             try{
               out.close();
@@ -1110,7 +1058,7 @@ public void bSAVE() {
                   JOptionPane.showMessageDialog(null, new StringBuffer().append("error : ").append(error) );
           }
         }
-    }
+      }
     }
   }
   );
@@ -1124,7 +1072,7 @@ public void updateModel(){
 
 public void updateView(){
   for(int j=0; j<ConfigNames.length; j++) {
-    
+
     //confItem[j].setValue(int(MWI.getProperty(ConfigNames[j])));
     if(j >= CONFIGITEMS)
     return;
@@ -1132,11 +1080,11 @@ public void updateView(){
   confItem[j].setValue(value);
   if (j == CONFIGITEMS-1){
     buttonWRITE.setColorBackground(green_);
-  }  
+  }
   if (value >0){
     toggleConfItem[j].setValue(1);
-    }
-    else {
+  }
+  else {
     toggleConfItem[j].setValue(0);
   }
 
@@ -1178,15 +1126,12 @@ public class MwiFileFilter extends FileFilter {
       }
     }
     return null;
-  } 
+  }
 
   public String getDescription() {
     return "*.osd Rush_OSD configuration file";
-  }   
+  }
 }
-
-
-
 
 // import the content of a file into the model
 public void bIMPORT(){
@@ -1203,10 +1148,10 @@ public void bIMPORT(){
         String error = null;
         try{
           in = new FileInputStream(file) ;
-          MWI.conf.loadFromXML(in); 
+          MWI.conf.loadFromXML(in);
           JOptionPane.showMessageDialog(null,new StringBuffer().append("configuration loaded : ").append(file.toURI()) );
           completed  = true;
-          
+
         }catch(FileNotFoundException e){
                 error = e.getCause().toString();
 
@@ -1225,19 +1170,18 @@ public void bIMPORT(){
               in.close();
             }catch( IOException ioe){/*failed to close the file*/}
           }
-          
-          if (error !=null){
-                  JOptionPane.showMessageDialog(null, new StringBuffer().append("error : ").append(error) );
+
+          if(error !=null){
+            JOptionPane.showMessageDialog(null, new StringBuffer().append("error : ").append(error) );
           }
         }
       }
     }
-  }
-  );
+  });
 }
 
 
-//  our model 
+//  our model
 static class MWI {
   private static Properties conf = new Properties();
 
@@ -1255,20 +1199,7 @@ static class MWI {
   }
 }
 
-//********************************************************
-//********************************************************
-//********************************************************
-
-
-
-
-
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// BEGIN MW SERIAL////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// BEGIN MW SERIAL
 
 int STABLEMODE =  1;           // OK
 int BAROMODE=     4;           // OK
@@ -1278,7 +1209,7 @@ int GPSHOLDMODE=  64;          // OK
 int GPSHOMEMODE=  128;         // OK
 
 void SetMode(){
-  STABLEMODE =  int(confItem[1].value());          
+  STABLEMODE =  int(confItem[1].value());
   BAROMODE=     int(confItem[2].value());         // OK
   MAGMODE=      int(confItem[3].value());
   ARMEDMODE=    int(confItem[4].value());
@@ -1318,48 +1249,42 @@ int I2CError=0;
 int cycleTime=0;
 int pMeterSum=0;
 
-
-
-        
-        
-        
-        
 void createMessageBox() {
   // create a group to store the messageBox elements
   messageBox = GroupcontrolP5.addGroup("messageBox",width/2 - 450,height/2 -60,300);
   messageBox.setBackgroundHeight(120);
   messageBox.setBackgroundColor(color(120,255));
   messageBox.hideBar();
-  
+
   // add a TextLabel to the messageBox.
   MessageText = GroupcontrolP5.addTextlabel("messageBoxLabel","Some MessageBox text goes here.",20,20);
  MessageText.moveTo(messageBox);
-  
+
   // add a textfield-controller with named-id inputbox
   // this controller will be linked to function inputbox() below.
- 
+
   // add the OK button to the messageBox.
   // the name of the button corresponds to function buttonOK
   // below and will be triggered when pressing the button.
   Button b1 = controlP5.addButton("buttonOK",0,65,80,80,24);
   b1.moveTo(messageBox);
   //b1.setColorBackground(color(80));
-  b1.setColorForeground(red_); 
+  b1.setColorForeground(red_);
   b1.setColorActive(red_);
-  // by default setValue would trigger function buttonOK, 
+  // by default setValue would trigger function buttonOK,
   // therefore we disable the broadcasting before setting
   // the value and enable broadcasting again afterwards.
   // same applies to the cancel button below.
-  b1.setBroadcast(false); 
+  b1.setBroadcast(false);
   b1.setValue(1);
   b1.setBroadcast(true);
   b1.setCaptionLabel("OK");
-  // centering of a label needs to be done manually 
+  // centering of a label needs to be done manually
   // with marginTop and marginLeft
   //b1.captionLabel().style().marginTop = -2;
   //b1.captionLabel().style().marginLeft = 26;
-  
-  // add the Cancel button to the messageBox. 
+
+  // add the Cancel button to the messageBox.
   // the name of the button corresponds to function buttonCancel
   // below and will be triggered when pressing the button.
   Button b2 = GroupcontrolP5.addButton("buttonCancel",0,155,80,80,24);
@@ -1371,7 +1296,7 @@ void createMessageBox() {
   b2.setColorBackground(color(40));
   b2.setColorActive(color(20));
   //b2.captionLabel().toUpperCase(false);
-  // centering of a label needs to be done manually 
+  // centering of a label needs to be done manually
   // with marginTop and marginLeft
   //b2.captionLabel().style().marginTop = -2;
   //b2.captionLabel().style().marginLeft = 16;
@@ -1395,8 +1320,8 @@ void buttonCancel(int theValue) {
   messageBox.hide();
 }
 
-// inputbox is called whenever RETURN has been pressed 
-// in textfield-controller inputbox 
+// inputbox is called whenever RETURN has been pressed
+// in textfield-controller inputbox
 void inputbox(String theString) {
   println("got something from the inputbox : "+theString);
   //messageBoxString = theString;
@@ -1404,32 +1329,27 @@ void inputbox(String theString) {
 }
 
 void mouseReleased() {
-   mouseDown = false;
-                mouseUp = true;
-                if (curPixel>-1)changePixel(curPixel);
-                if (curChar>-1)GetChar(curChar);
+  mouseDown = false;
+  mouseUp = true;
+  if(curPixel>-1)
+    changePixel(curPixel);
+  if(curChar>-1)
+    GetChar(curChar);
   ControlLock();
-  
-} 
+}
 
-        
 public void mousePressed() {
-                mouseDown = true;
-                mouseUp = false;
-        }
+  mouseDown = true;
+  mouseUp = false;
+}
 
+public boolean mouseDown() {
+  return mouseDown;
+}
 
-
-        public boolean mouseDown() {
-                return mouseDown;
-        }
-
-        public boolean mouseUp() {
-                return mouseUp;
-        }
-        
-        
-        
+public boolean mouseUp() {
+  return mouseUp;
+}
 
 
 void exit() {
@@ -1438,15 +1358,11 @@ void exit() {
   toggleMSP_Data = false;
   delay(1000);
   InitSerial(200.00);
-  
+
   //if (init_com==1){
     //init_com=0;
   //g_serial.stop();
   //}
-  
- 
-  
+
   super.exit();
 }
-
-

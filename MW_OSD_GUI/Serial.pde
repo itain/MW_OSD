@@ -145,7 +145,8 @@ void SetConfigItem(int index, int value) {
     }
   }
   catch(Exception e) {
-  }finally {
+  }
+  finally {
   }  	
 }
 
@@ -322,9 +323,11 @@ public void evaluateCommand(byte cmd, int size) {
 
     if(cmd_internal == OSD_GET_FONT) {
       if( size == 1) {
-	headSerialReply(MSP_OSD, 3);
+	headSerialReply(MSP_OSD, 5);
 	serialize8(OSD_GET_FONT);
-	serialize16(7456);
+	serialize16(7456);	// safety code
+	serialize8(0);		// first char
+	serialize8(255);	// last char
       }
       else if(size == 2) {
 	int cindex = read8();
@@ -336,6 +339,10 @@ public void evaluateCommand(byte cmd, int size) {
 	serialize8(cindex);
        
 	System.out.println("Sent Char "+cindex);
+        if(cindex == 255)
+          buttonSendFile.getCaptionLabel().setText("SEND");
+        else
+          buttonSendFile.getCaptionLabel().setText(nf(cindex, 4));
       }
     }
     break;

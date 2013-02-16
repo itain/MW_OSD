@@ -187,14 +187,8 @@ buttonBrowseFile = controlP5.addButton("Browse",1,20,50,60,16)
 ;
 buttonSendFile = controlP5.addButton("FONT_UPLOAD",1,20,75,60,16)
 .setGroup(MGUploadF);
-;
- 
-}
-
-public void Send(){
-  //sendFontFile();
-  //g_serial.clear();
-  //CreateFontFile();
+buttonSendFile.getCaptionLabel()
+.setText("SEND");
 }
 
 void MakePreviewChar(){
