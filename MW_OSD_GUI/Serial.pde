@@ -96,6 +96,8 @@ void InitSerial(float portValue) {
       delay(2000);
       
       READ();
+
+      randomSeed(millis());
       //+((int)(cmd&0xFF))+": "+(checksum&0xFF)+" expected, got "+(int)(c&0xFF));
     }
   }
@@ -329,25 +331,35 @@ public void evaluateCommand(byte cmd, int size) {
 	serialize8(0);		// first char
 	serialize8(255);	// last char
       }
-      else if(size == 2) {
-	int cindex = read8();
-	//System.out.println("send char "+cindex);
-	headSerialReply(MSP_OSD, 56);
-        serialize8(OSD_GET_FONT);
-	for(int i = 0; i < 54; i++)
-	   serialize8(int(raw_font[cindex][i]));
-	serialize8(cindex);
-       
-	System.out.println("Sent Char "+cindex);
-        if(cindex == 255)
+      else if(size == 3) {
+	int cindex = read16();
+        if((cindex&0xffff) == 0xffff) { // End!
+          headSerialReply(MSP_OSD, 1);
+          serialize8(OSD_NULL);
+	  System.out.println("End marker "+cindex);
           buttonSendFile.getCaptionLabel().setText("SEND");
-        else
-          buttonSendFile.getCaptionLabel().setText(nf(cindex, 4));
+        }
+        else {
+	  headSerialReply(MSP_OSD, 56);
+	  serialize8(OSD_GET_FONT);
+	  for(int i = 0; i < 54; i++)
+	     serialize8(int(raw_font[cindex][i]));
+	  serialize8(cindex);
+//     // XXX Fake errors to force retransmission
+//        if(int(random(3)) == 0) {
+//          System.out.println("Messed char "+cindex);
+//          outChecksum ^= int(random(1,256));
+//        }
+//        else
+//     // End fake errors code
+	    System.out.println("Sent Char "+cindex);
+          buttonSendFile.getCaptionLabel().setText(nf(cindex, 3)+"/256");
+        }
       }
     }
     break;
   }
-    
+
   case MSP_IDENT:
   
     headSerialReply(MSP_IDENT, 7);

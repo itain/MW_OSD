@@ -256,8 +256,8 @@ void write_NVM(uint8_t char_address)
 #ifdef WRITE_TO_MAX7456
   // disable display
   digitalWrite(MAX7456SELECT,LOW);
-  //spi_transfer(VM0_reg);
-  //spi_transfer(Settings[S_VIDEOSIGNALTYPE]?0x40:0);
+  spi_transfer(VM0_reg);
+  spi_transfer(Settings[S_VIDEOSIGNALTYPE]?0x40:0);
 
   spi_transfer(MAX7456ADD_CMAH); // set start address high
   spi_transfer(char_address);
@@ -277,8 +277,8 @@ void write_NVM(uint8_t char_address)
   // wait until bit 5 in the status register returns to 0 (12ms)
   while ((spi_transfer(MAX7456ADD_STAT) & STATUS_reg_nvr_busy) != 0x00);
 
-  //spi_transfer(VM0_reg); // turn on screen next vertical
-  //spi_transfer(Settings[S_VIDEOSIGNALTYPE]?0x4c:0x0c);
+  spi_transfer(VM0_reg); // turn on screen next vertical
+  spi_transfer(Settings[S_VIDEOSIGNALTYPE]?0x4c:0x0c);
   digitalWrite(MAX7456SELECT,HIGH);
 #else
   delay(12);

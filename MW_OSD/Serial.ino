@@ -633,20 +633,23 @@ void blankserialRequest(uint8_t requestMSP)
 }
 
 void fontSerialRequest() {
+  int16_t cindex = getNextCharToRequest();
   uint8_t txCheckSum;
   uint8_t txSize;
   Serial.write('$');
   Serial.write('M');
   Serial.write('<');
   txCheckSum=0;
-  txSize=2;
+  txSize=3;
   Serial.write(txSize);
   txCheckSum ^= txSize;
-  Serial.write(MSP_OSD&0xff);
+  Serial.write(MSP_OSD);
   txCheckSum ^= MSP_OSD;
   Serial.write(OSD_GET_FONT);
   txCheckSum ^= OSD_GET_FONT;
-  Serial.write(nextCharToRequest);
-  txCheckSum ^= nextCharToRequest;
+  Serial.write(cindex);
+  txCheckSum ^= cindex;
+  Serial.write(cindex>>8);
+  txCheckSum ^= cindex>>8;
   Serial.write(txCheckSum);
 }

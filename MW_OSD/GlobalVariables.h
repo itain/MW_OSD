@@ -23,9 +23,7 @@ uint8_t fontMode = 0;
 uint8_t fontData[54];
 uint8_t nextCharToRequest;
 uint8_t lastCharToRequest;
-/*
-uint8_t lastCharReceived;
-*/
+uint8_t retransmitQueue;
 
 // Mode bits
 uint32_t mode_armed;

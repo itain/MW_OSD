@@ -382,6 +382,8 @@ void displayMode()
 {
   int SimModebits = 0;
   int SimBitCounter = 1;
+    mapchar(0, 0);
+    mapchar(1, 1);
     for (int i=0; i<boxnames.length; i++) {
       if(toggleModeItems[i].getValue() > 0)
         SimModebits |= SimBitCounter;
