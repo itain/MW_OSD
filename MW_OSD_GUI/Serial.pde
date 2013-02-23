@@ -8,7 +8,6 @@ public boolean toggleRead = false,
         toggleSpekBind = false,
         toggleSetSetting = false;
 Serial g_serial;      // The serial port
-int FilePercent = 0;
 float LastPort = 0;
 /******************************* Multiwii Serial Protocol **********************/
 
@@ -22,7 +21,6 @@ String boxnames[] = { // names for dynamic generation of config GUI
     "GPS HOME;",
     "GPS HOLD;",
     "OSD SW;",
-    
   };
 String strBoxNames = join(boxnames,""); 
 //int modebits = 0;
@@ -49,7 +47,6 @@ private static final int
   MSP_BOXNAMES             =116,
   MSP_PIDNAMES             =117,
   MSP_BOXIDS               =119,
-  MSP_RSSI                 =120,
   MSP_SET_RAW_RC           =200,
   MSP_SET_RAW_GPS          =201,
   MSP_SET_PID              =202,
@@ -98,7 +95,6 @@ void InitSerial(float portValue) {
       READ();
 
       randomSeed(millis());
-      //+((int)(cmd&0xFF))+": "+(checksum&0xFF)+" expected, got "+(int)(c&0xFF));
     }
   }
   else {
@@ -196,10 +192,8 @@ public static final int
   HEADER_CMD = 5,
   HEADER_ERR = 6;
 
-private static final String MSP_SIM_HEADER = "$M>";
 int c_state = IDLE;
 boolean err_rcvd = false;
-List<Character> payload;
 byte checksum=0;
 byte cmd;
 int offset=0, dataSize=0;
@@ -483,13 +477,6 @@ public void evaluateCommand(byte cmd, int size) {
      }
      break;
 
-   case MSP_RSSI:
-   
-     headSerialReply(MSP_RSSI, 2);
-     serialize16(700);
-     break;
-
-
   default:
     System.out.print("Unsupported request = ");
     System.out.println(str(icmd));
@@ -507,7 +494,6 @@ public void evaluateCommand(byte cmd, int size) {
 
 void MWData_Com() {
   if (toggleMSP_Data == false) return;
-  List<Character> payload;
   int i;
   int c = 0;
   if ((init_com==1)  && (toggleMSP_Data == true)) {

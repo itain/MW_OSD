@@ -132,7 +132,7 @@ int currentRow = 0;
 
 
 ControlP5 controlP5;
-ControlP5 SmallcontrolP5;
+//ControlP5 SmallcontrolP5;
 ControlP5 ScontrolP5;
 ControlP5 FontGroupcontrolP5;
 ControlP5 GroupcontrolP5;
@@ -140,33 +140,18 @@ Textlabel txtlblWhichcom;
 ListBox commListbox;
 
 char serialBuffer[] = new char[128]; // this hold the imcoming string from serial O string
-String TestString = "";
-String SendCommand = "";
-
-
-boolean firstContact = false;
-boolean disableSerial = false;
 
 boolean PortRead = true;
 boolean PortWrite = false;
-
 
 ControlGroup messageBox;
 Textlabel MessageText;
 int messageBoxResult = -1;
 
-
-
 // Int variables
-
-String LoadPercent = "";
 int init_com;
 int commListMax;
-int whichKey = -1;  // Variable to hold keystoke values
-int inByte = -1;    // Incoming serial data
-int[] serialInArray = new int[3];    // Where we'll put what we receive
 
-String test;
 int serialCount = 0;                 // A count of how many bytes we receive
 int ConfigEEPROM = -1;
 int ConfigVALUE = -1;
@@ -408,7 +393,7 @@ String[] SimNames= {
   1};
 
 
-PFont font8,font9,font10,font11,font12,font15;
+PFont font9,font10,font11,font12;
 
 // Colors
 color yellow_ = color(200, 200, 20),
@@ -421,7 +406,6 @@ color yellow_ = color(200, 200, 20),
 // textlabels
 Textlabel txtlblconfItem[] = new Textlabel[CONFIGITEMS] ;
 Textlabel txtlblSimItem[] = new Textlabel[SIMITEMS] ;
-Textlabel FileUploadText;
 // textlabels
 
 // Buttons------------------------------------------------------------------------------------------------------------------
@@ -473,27 +457,24 @@ controlP5.Controller hideLabel(controlP5.Controller c) {
 void setup() {
   size(windowsX,windowsY);
 
-//Map<Settings, String> table = new EnumMap<Settings>(Settings.class);
-OnTimer = millis();
+  OnTimer = millis();
   frameRate(10);
-OSDBackground = loadImage("Background.jpg");
+  OSDBackground = loadImage("Background.jpg");
 RadioPot = loadImage("Radio_Pot.png");
 
-  font8 = createFont("Arial bold",8,false);
   font9 = createFont("Arial bold",10,false);
   font10 = createFont("Arial bold",11,false);
   font11 = createFont("Arial bold",11,false);
   font12 = createFont("Arial bold",12,false);
-  font15 = createFont("Arial bold",15,false);
 
   controlP5 = new ControlP5(this); // initialize the GUI controls
   controlP5.setControlFont(font10);
   controlP5.setAutoDraw(false);
 
 
-  SmallcontrolP5 = new ControlP5(this); // initialize the GUI controls
-  SmallcontrolP5.setControlFont(font9);
-  SmallcontrolP5.setAutoDraw(false);
+//  SmallcontrolP5 = new ControlP5(this); // initialize the GUI controls
+//  SmallcontrolP5.setControlFont(font9);
+//  SmallcontrolP5.setAutoDraw(false);
 
   ScontrolP5 = new ControlP5(this); // initialize the GUI controls
   ScontrolP5.setControlFont(font10);
@@ -823,7 +804,7 @@ void draw() {
   GroupcontrolP5.draw();
   controlP5.draw();
   ScontrolP5.draw();
-  SmallcontrolP5.draw();
+  //SmallcontrolP5.draw();
   FontGroupcontrolP5.draw();
   MatchConfigs();
   popMatrix();
