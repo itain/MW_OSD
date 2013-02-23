@@ -5,6 +5,7 @@ static uint8_t dataSize;
 static uint8_t cmdMSP;
 static uint8_t rcvChecksum;
 static uint8_t readIndex;
+static uint8_t txCheckSum;
 
 uint32_t read32() {
   uint32_t t = read16();
@@ -22,6 +23,19 @@ uint8_t read8()  {
   return serialBuffer[readIndex++];
 }
 
+void write8(uint8_t b) {
+  Serial.write(b);
+  txCheckSum ^= b;
+}
+
+void writeReqHeader(uint8_t size) {
+  Serial.write('$');
+  Serial.write('M');
+  Serial.write('<');
+  Serial.write(size);
+  txCheckSum = size;
+}
+
 // --------------------------------------------------------------------------------------
 // Here are decoded received commands from MultiWii
 void serialMSPCheck()
@@ -31,21 +45,11 @@ void serialMSPCheck()
   if (cmdMSP == MSP_OSD) {
     uint8_t cmd = read8();
     if(cmd == OSD_READ_CMD) {
-      uint8_t txCheckSum, txSize;
-      Serial.write('$');
-      Serial.write('M');
-      Serial.write('<');
-      txCheckSum=0;
-      txSize = EEPROM_SETTINGS + 1;
-      Serial.write(txSize);
-      txCheckSum ^= txSize;
-      Serial.write(MSP_OSD);
-      txCheckSum ^= MSP_OSD;
-      Serial.write(cmd);
-      txCheckSum ^= cmd;
+      writeReqHeader(EEPROM_SETTINGS + 1);
+      write8(MSP_OSD);
+      write8(cmd);
       for(uint8_t i=0; i<EEPROM_SETTINGS; i++) {
-        Serial.write(Settings[i]);
-	txCheckSum ^= Settings[i];
+        write8(Settings[i]);
       }
       Serial.write(txCheckSum);
     }
@@ -561,55 +565,28 @@ void configExit()
 
 void saveExit()
 {
-  uint8_t txCheckSum;
-  uint8_t txSize;
-
   if (configPage==1){
-    Serial.write('$');
-    Serial.write('M');
-    Serial.write('<');
-    txCheckSum=0;
-    txSize=30;
-    Serial.write(txSize);
-    txCheckSum ^= txSize;
-    Serial.write(MSP_SET_PID);
-    txCheckSum ^= MSP_SET_PID;
+    writeReqHeader(30);
+    write8(MSP_SET_PID);
     for(uint8_t i=0; i<PIDITEMS; i++) {
-      Serial.write(P8[i]);
-      txCheckSum ^= P8[i];
-      Serial.write(I8[i]);
-      txCheckSum ^= I8[i];
-      Serial.write(D8[i]);
-      txCheckSum ^= D8[i];
+      write8(P8[i]);
+      write8(I8[i]);
+      write8(D8[i]);
     }
     Serial.write(txCheckSum);
   }
 
   if (configPage==2){
-    Serial.write('$');
-    Serial.write('M');
-    Serial.write('<');
-    txCheckSum=0;
-    txSize=7;
-    Serial.write(txSize);
-    txCheckSum ^= txSize;
-    Serial.write(MSP_SET_RC_TUNING);
-    txCheckSum ^= MSP_SET_RC_TUNING;
-    Serial.write(rcRate8);
-    txCheckSum ^= rcRate8;
-    Serial.write(rcExpo8);
-    txCheckSum ^= rcExpo8;
-    Serial.write(rollPitchRate);
-    txCheckSum ^= rollPitchRate;
-    Serial.write(yawRate);
-    txCheckSum ^= yawRate;
-    Serial.write(dynThrPID);
-    txCheckSum ^= dynThrPID;
-    Serial.write(thrMid8);
-    txCheckSum ^= thrMid8;
-    Serial.write(thrExpo8);
-    txCheckSum ^= thrExpo8;
-    Serial.write(txCheckSum);
+    writeReqHeader(7);
+    write8(MSP_SET_RC_TUNING);
+    write8(rcRate8);
+    write8(rcExpo8);
+    write8(rollPitchRate);
+    write8(yawRate);
+    write8(dynThrPID);
+    write8(thrMid8);
+    write8(thrExpo8);
+    write8(txCheckSum);
   }
 
   if (configPage==3 || configPage==4){
@@ -624,32 +601,17 @@ void blankserialRequest(uint8_t requestMSP)
     fontSerialRequest();
     return;
   }
-  Serial.write('$');
-  Serial.write('M');
-  Serial.write('<');
-  Serial.write((uint8_t)0x00);
-  Serial.write(requestMSP);
-  Serial.write(requestMSP);
+  writeReqHeader(0);
+  write8(requestMSP);
+  write8(txCheckSum);
 }
 
 void fontSerialRequest() {
   int16_t cindex = getNextCharToRequest();
-  uint8_t txCheckSum;
-  uint8_t txSize;
-  Serial.write('$');
-  Serial.write('M');
-  Serial.write('<');
-  txCheckSum=0;
-  txSize=3;
-  Serial.write(txSize);
-  txCheckSum ^= txSize;
-  Serial.write(MSP_OSD);
-  txCheckSum ^= MSP_OSD;
-  Serial.write(OSD_GET_FONT);
-  txCheckSum ^= OSD_GET_FONT;
-  Serial.write(cindex);
-  txCheckSum ^= cindex;
-  Serial.write(cindex>>8);
-  txCheckSum ^= cindex>>8;
-  Serial.write(txCheckSum);
+  writeReqHeader(3);
+  write8(MSP_OSD);
+  write8(OSD_GET_FONT);
+  write8(cindex);
+  write8(cindex>>8);
+  write8(txCheckSum);
 }
