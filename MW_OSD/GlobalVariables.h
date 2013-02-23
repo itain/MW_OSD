@@ -180,7 +180,7 @@ int8_t temperature=0;                  // temperature in degrees Centigrade
 // Statistics
 uint16_t speedMAX=0;
 int8_t temperMAX=0;
-int16_t altitudeMAX=0;
+int32_t altitudeMAX=0;
 int16_t distanceMAX=0;
 float trip=0;
 uint16_t flyingTime=0;
@@ -243,7 +243,7 @@ uint16_t flyingTime=0;
 // End private MSP for use with the GUI
 
 // For Intro
-const char message0[] PROGMEM = "KV_OSD_TEAM_2.2";
+const char message0[] PROGMEM = "MW_OSD_2.2";
 const char message1[] PROGMEM = "VIDEO SIGNAL: NTSC";
 const char message2[] PROGMEM = "VIDEO SIGNAL: PAL ";
 const char message5[] PROGMEM = "MW VERSION:";
@@ -302,21 +302,21 @@ const char configMsg42[] PROGMEM = "PAL";
 //-----------------------------------------------------------Page5
 const char configMsg43[] PROGMEM = "5/6 CALIBRATION";
 const char configMsg44[] PROGMEM = "ACC CALIBRATION";
-const char configMsg45[] PROGMEM = "ACC ROLL :";
-const char configMsg46[] PROGMEM = "ACC PITCH :";
-const char configMsg47[] PROGMEM = "ACC Z :";
+const char configMsg45[] PROGMEM = "ACC ROLL";
+const char configMsg46[] PROGMEM = "ACC PITCH";
+const char configMsg47[] PROGMEM = "ACC Z";
 const char configMsg48[] PROGMEM = "MAG CALIBRATION";
 const char configMsg49[] PROGMEM = "HEADING";
 const char configMsg50[] PROGMEM = "MW EEPROM WRITE";
 //-----------------------------------------------------------Page6
 const char configMsg51[] PROGMEM = "6/6 STATISTICS";
-const char configMsg52[] PROGMEM = "TRIP:";
-const char configMsg53[] PROGMEM = "MAX DISTANCE:";
-const char configMsg54[] PROGMEM = "MAX ALTITUDE:";
-const char configMsg55[] PROGMEM = "MAX SPEED:";
-const char configMsg56[] PROGMEM = "FLYING TIME:";
-const char configMsg57[] PROGMEM = "DRAINED AMPS:";
-const char configMsg58[] PROGMEM = "MAX TEMP:";
+const char configMsg52[] PROGMEM = "TRIP";
+const char configMsg53[] PROGMEM = "MAX DISTANCE";
+const char configMsg54[] PROGMEM = "MAX ALTITUDE";
+const char configMsg55[] PROGMEM = "MAX SPEED";
+const char configMsg56[] PROGMEM = "FLYING TIME";
+const char configMsg57[] PROGMEM = "DRAINED AMPS";
+const char configMsg58[] PROGMEM = "MAX TEMP";
 
 // All screen locations defines in ScreenLayout.ino
 enum Positions {

@@ -104,6 +104,7 @@ uint8_t MAX7456RESET;		// output pin
 //uint8_t ENABLE_display_vert;
 //uint8_t DISABLE_display;
 uint16_t MAX_screen_size;
+uint8_t videomode;
 
 //////////////////////////////////////////////////////////////
 uint8_t spi_transfer(uint8_t data)
@@ -112,6 +113,12 @@ uint8_t spi_transfer(uint8_t data)
   while (!(SPSR & (1<<SPIF)))     // Wait the end of the transmission
     ;
   return SPDR;                    // return the received byte
+}
+
+void MAX7456_Send(uint8_t add, uint8_t data)
+{
+  spi_transfer(add);
+  spi_transfer(data);
 }
 
 // ============================================================   WRITE TO SCREEN
@@ -125,20 +132,16 @@ void MAX7456Setup(void)
   MAX7456Configure();
 
   if(Settings[S_VIDEOSIGNALTYPE]) {    // PAL
-    //ENABLE_display = 0x48;
-    //ENABLE_display_vert = 0x4c;
     MAX7456_reset = 0x42;
-    //DISABLE_display = 0x40;
     MAX_screen_size = 480;
     MAX_screen_rows = 16;
+    videomode = VIDEO_MODE_PAL;
   }
   else {                                // NTSC
-    //ENABLE_display = 0x08;
-    //ENABLE_display_vert = 0x0c;
     MAX7456_reset = 0x02;
-    //DISABLE_display = 0x00;
     MAX_screen_size = 390;
     MAX_screen_rows = 13;
+    videomode = VIDEO_MODE_NTSC;
   }
 
   pinMode(MAX7456RESET,OUTPUT);
@@ -179,14 +182,8 @@ void MAX7456Setup(void)
   }
 
   // make sure the Max7456 is enabled
-  spi_transfer(VM0_reg);
+  MAX7456_Send(VM0_reg, videomode|OSD_ENABLE);
 
-  if (Settings[S_VIDEOSIGNALTYPE]){
-    spi_transfer(OSD_ENABLE|VIDEO_MODE_PAL);
-  }
-  else{
-    spi_transfer(OSD_ENABLE|VIDEO_MODE_NTSC);
-  }
   digitalWrite(MAX7456SELECT,HIGH);
   delay(100);
 }
@@ -194,10 +191,11 @@ void MAX7456Setup(void)
 // Copy string from ram into screen buffer
 void MAX7456_WriteString(const char *string, int Adresse)
 {
-  uint8_t xx;
-  for(xx=0;string[xx]!=0;)
+  uint8_t xx = 0;
+  char c;
+  while((c = string[xx++]) != 0)
   {
-    screen[Adresse++] = string[xx++];
+    screen[Adresse++] = c;
   }
 }
 
@@ -227,12 +225,6 @@ void MAX7456_DrawScreen()
   digitalWrite(MAX7456SELECT,HIGH);
 }
 
-void MAX7456_Send(uint8_t add, uint8_t data)
-{
-  spi_transfer(add);
-  spi_transfer(data);
-}
-
 void MAX7456Configure() {
   // todo - automatically recognising card.
   if(Settings[S_BOARDTYPE] == 0) {	// Minim
@@ -256,29 +248,24 @@ void write_NVM(uint8_t char_address)
 #ifdef WRITE_TO_MAX7456
   // disable display
   digitalWrite(MAX7456SELECT,LOW);
-  spi_transfer(VM0_reg);
-  spi_transfer(Settings[S_VIDEOSIGNALTYPE]?0x40:0);
+  MAX7456_Send(VM0_reg, videomode);
 
-  spi_transfer(MAX7456ADD_CMAH); // set start address high
-  spi_transfer(char_address);
+  MAX7456_Send(MAX7456ADD_CMAH, char_address); // set start address high
 
   for(uint8_t x = 0; x < NVM_ram_size; x++) // write out 54 bytes of character to shadow ram
   {
-    spi_transfer(MAX7456ADD_CMAL); // set start address low
-    spi_transfer(x);
-    spi_transfer(MAX7456ADD_CMDI);
-    spi_transfer(fontData[x]);
+    MAX7456_Send(MAX7456ADD_CMAL, x); // set start address low
+    MAX7456_Send(MAX7456ADD_CMDI, fontData[x]);
   }
 
-  // transfer 54 bytes from shadow ram to NVM
-  spi_transfer(MAX7456ADD_CMM);
-  spi_transfer(WRITE_nvr);
+  // Transfer the 54 bytes from shadow ram to NVM
+  MAX7456_Send(MAX7456ADD_CMM, WRITE_nvr);
   
   // wait until bit 5 in the status register returns to 0 (12ms)
-  while ((spi_transfer(MAX7456ADD_STAT) & STATUS_reg_nvr_busy) != 0x00);
-
-  spi_transfer(VM0_reg); // turn on screen next vertical
-  spi_transfer(Settings[S_VIDEOSIGNALTYPE]?0x4c:0x0c);
+  while ((spi_transfer(MAX7456ADD_STAT) & STATUS_reg_nvr_busy) != 0x00)
+    ;
+    
+  //MAX7456_Send(VM0_reg, videomode|OSD_ENABLE); // turn on screen
   digitalWrite(MAX7456SELECT,HIGH);
 #else
   delay(12);

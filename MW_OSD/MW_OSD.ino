@@ -383,6 +383,12 @@ void CollectStatistics() {
 
   if(temperature > temperMAX)
     temperMAX = temperature;
+
+  if(MwAltitude > altitudeMAX)
+    altitudeMAX = MwAltitude;
+
+  if(GPS_distanceToHome > distanceMAX)
+    distanceMAX = GPS_distanceToHome;
 }
 
 void calculateTrip(void)
@@ -493,6 +499,7 @@ int16_t getNextCharToRequest() {
   if(temp1 == 0) {
     fontMode = 0;                            // Exit font mode
     setMspRequests();
+    MAX7456Setup();
     return -1;
   }
 
