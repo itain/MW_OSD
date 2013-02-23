@@ -219,11 +219,34 @@ int Showback = 1;
 
 // For Heading
 char[] headGraph={
-  0x1a,0x1d,0x1c,0x1d,0x19,0x1d,0x1c,0x1d,0x1b,0x1d,0x1c,0x1d,0x18,0x1d,0x1c,0x1d,0x1a,0x1d,0x1c,0x1d,0x19,0x1d,0x1c,0x1d,0x1b};
+  SYM_HEADING_E,
+  SYM_HEADING_LINE,
+  SYM_HEADING_DIVIDED_LINE,
+  SYM_HEADING_LINE,
+  SYM_HEADING_S,
+  SYM_HEADING_LINE,
+  SYM_HEADING_DIVIDED_LINE,
+  SYM_HEADING_LINE,
+  SYM_HEADING_W,
+  SYM_HEADING_LINE,
+  SYM_HEADING_DIVIDED_LINE,
+  SYM_HEADING_LINE,
+  SYM_HEADING_N,
+  SYM_HEADING_LINE,
+  SYM_HEADING_DIVIDED_LINE,
+  SYM_HEADING_LINE,
+  SYM_HEADING_E,
+  SYM_HEADING_LINE,
+  SYM_HEADING_DIVIDED_LINE,
+  SYM_HEADING_LINE,
+  SYM_HEADING_S,
+  SYM_HEADING_LINE,
+  SYM_HEADING_DIVIDED_LINE,
+  SYM_HEADING_LINE,
+  SYM_HEADING_W
+};
 
 static int MwHeading=0;
-char MwHeadingUnitAdd=0xbd;
-
 
 String[] ConfigNames = {
   "EEPROM Loaded",
@@ -257,8 +280,8 @@ String[] ConfigNames = {
 
   "Units",
   "Video Signal",
-  "Display Thottle Position",
-  "Display Hoizon Bar",
+  "Display Throttle Position",
+  "Display Horizon Bar",
   "Display Horizon Side Bars",
   "Display Battery Evo",
   "Reset Stats After Arm",
@@ -299,8 +322,8 @@ String[] ConfigHelp = {
 
   "Unit System:",
   "Screen Type NTSC / PAL:",
-  "Display Thottle Position",
-  "Display Hoizon Bar:",
+  "Display Throttle Position",
+  "Display Horizon Bar:",
   "Display Horizon Side Bars:",
   "Display Battery Evo:",
   "Reset Stats After Arm:",
