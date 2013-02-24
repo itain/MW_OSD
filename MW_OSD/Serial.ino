@@ -28,6 +28,10 @@ void write8(uint8_t b) {
   txCheckSum ^= b;
 }
 
+void endSerialRequest() {
+  Serial.write(txCheckSum);
+}
+
 void writeReqHeader(uint8_t size) {
   Serial.write('$');
   Serial.write('M');
@@ -51,7 +55,7 @@ void serialMSPCheck()
       for(uint8_t i=0; i<EEPROM_SETTINGS; i++) {
         write8(Settings[i]);
       }
-      Serial.write(txCheckSum);
+      endSerialRequest();
     }
 
     if (cmd == OSD_WRITE_CMD) {
@@ -283,200 +287,9 @@ void serialMSPCheck()
 #endif
     modeMSPRequests &=~ REQ_MSP_BOX;
   }
-  #endif
+#endif
 }
-
 // End of decoded received commands from MultiWii
-// --------------------------------------------------------------------------------------
-
-void handleRawRC() {
-  static uint8_t waitStick;
-  static uint32_t stickTime;
-  static uint32_t timeout;
-
-  if(MwRcData[PITCHSTICK] > 1300 && MwRcData[PITCHSTICK] < 1700 &&
-     MwRcData[ROLLSTICK] > 1300 && MwRcData[ROLLSTICK] < 1700 &&
-     MwRcData[YAWSTICK] > 1300 && MwRcData[YAWSTICK] < 1700) {
-	waitStick = 0;
-        timeout = 1000;
-  }
-  else if(waitStick == 1) {
-    if((millis() - stickTime) > timeout)
-      waitStick = 0;
-      timeout = 300;
-  }
-
-  if(!waitStick)
-  {
-    if((MwRcData[PITCHSTICK]>MAXSTICK)&&(MwRcData[YAWSTICK]>MAXSTICK)&&(MwRcData[THROTTLESTICK]>MINSTICK)&&!configMode&&(onTime>5)&&!armed)
-    {
-      // Enter config mode using stick combination
-      waitStick =  2;	// Sticks must return to center before continue!
-      configMode = 1;
-      setMspRequests();
-    }
-    else if(configMode) {
-      if(previousarmedstatus&&(MwRcData[THROTTLESTICK]>MINSTICK))
-      {
-	// EXIT from SHOW STATISTICS (menu page 6) AFTER DISARM (push throttle up) (Carlonb) NEB
-	waitStick = 2;
-	configExit();
-      }
-      if(!previousarmedstatus&&configMode&&(MwRcData[THROTTLESTICK]<MINSTICK)) // EXIT NEB mod for autostatistics
-      {
-	waitStick = 2;
-	configExit();
-      }
-      else if(configMode&&(MwRcData[ROLLSTICK]>MAXSTICK)) // MOVE RIGHT
-      {
-	waitStick = 1;
-	COL++;
-	if(COL>3) COL=3;
-      }
-      else if(configMode&&(MwRcData[ROLLSTICK]<MINSTICK)) // MOVE LEFT
-      {
-	waitStick = 1;
-	COL--;
-	if(COL<1) COL=1;
-      }
-      else if(configMode&&(MwRcData[PITCHSTICK]>MAXSTICK)) // MOVE UP
-      {
-	waitStick = 1;
-	ROW--;
-	if(ROW<1)
-	  ROW=1;
-      }
-      else if(configMode&&(MwRcData[PITCHSTICK]<MINSTICK)) // MOVE DOWN
-      {
-	waitStick = 1;
-	ROW++;
-	if(ROW>10)
-	  ROW=10;
-      }
-      else if(!previousarmedstatus&&configMode&&(MwRcData[YAWSTICK]<MINSTICK)) // DECREASE
-      {
-	waitStick = 1;
-
-	if(configPage == 1) {
-	  if(ROW >= 1 && ROW <= 5) {
-	    if(COL==1) P8[ROW-1]--;
-	    if(COL==2) I8[ROW-1]--;
-	    if(COL==3) D8[ROW-1]--;
-	  }
-
-	  if(ROW == 6) {
-	    if(COL==1) P8[7]--;
-	    if(COL==2) I8[7]--;
-	    if(COL==3) D8[7]--;
-	  }
-
-	  if((ROW==7)&&(COL==1)) P8[8]--;
-	}
-
-	if(configPage == 2 && COL == 3) {
-	  if(ROW==1) rcRate8--;
-	  if(ROW==2) rcExpo8--;
-	  if(ROW==3) rollPitchRate--;
-	  if(ROW==4) yawRate--;
-	  if(ROW==5) dynThrPID--;
-	}
-
-	if(configPage == 3 && COL == 3) {
-	  if(ROW==2) Settings[S_DISPLAYVOLTAGE]=!Settings[S_DISPLAYVOLTAGE];
-	  if(ROW==3) Settings[S_VOLTAGEMIN]--;
-	  if(ROW==4) Settings[S_DISPLAYTEMPERATURE]=!Settings[S_DISPLAYTEMPERATURE];
-	  if(ROW==5) Settings[S_TEMPERATUREMAX]--;
-	  if(ROW==6) Settings[S_DISPLAYGPS]=!Settings[S_DISPLAYGPS];
-          if(ROW==7) Settings[S_COORDINATES]=!Settings[S_COORDINATES];
-	}
-
-	if(configPage == 4 && COL == 3) {
-	  if(ROW==3) rssiTimer=15;
-	  if(ROW==4) Settings[S_RSSIMAX]=rssiADC;
-	  if(ROW==5) Settings[S_DISPLAYRSSI]=!Settings[S_DISPLAYRSSI];
-	  if(ROW==6) Settings[S_UNITSYSTEM]=!Settings[S_UNITSYSTEM];
-	  if(ROW==7) {
-	    Settings[S_VIDEOSIGNALTYPE]=!Settings[S_VIDEOSIGNALTYPE];
-	    MAX7456Setup();
-	  }
-	}
-
-	if(configPage == 5 && COL == 3) {
-	  if(ROW==1) accCalibrationTimer=0;
-	  if(ROW==5) magCalibrationTimer=0;
-	  if(ROW==7) eepromWriteTimer=0;
-	}
-
-	if((ROW==10)&&(COL==3)) configPage--;
-	if(configPage<MINPAGE) configPage = MAXPAGE;
-	if((ROW==10)&&(COL==1)) configExit();
-	if((ROW==10)&&(COL==2)) saveExit();
-      }
-      else if(!previousarmedstatus&&configMode&&(MwRcData[YAWSTICK]>MAXSTICK)) // INCREASE
-      {
-	waitStick =1;
-
-	if(configPage == 1) {
-	  if(ROW >= 1 && ROW <= 5) {
-	    if(COL==1) P8[ROW-1]++;
-	    if(COL==2) I8[ROW-1]++;
-	    if(COL==3) D8[ROW-1]++;
-	  }
-
-	  if(ROW == 6) {
-	    if(COL==1) P8[7]++;
-	    if(COL==2) I8[7]++;
-	    if(COL==3) D8[7]++;
-	  }
-
-	  if((ROW==7)&&(COL==1)) P8[8]++;
-	}
-
-	if(configPage == 2 && COL == 3) {
-	  if(ROW==1) rcRate8++;
-	  if(ROW==2) rcExpo8++;
-	  if(ROW==3) rollPitchRate++;
-	  if(ROW==4) yawRate++;
-	  if(ROW==5) dynThrPID++;
-	}
-
-	if(configPage == 3 && COL == 3) {
-	  if(ROW==2) Settings[S_DISPLAYVOLTAGE]=!Settings[S_DISPLAYVOLTAGE];
-	  if(ROW==3) Settings[S_VOLTAGEMIN]++;
-	  if(ROW==4) Settings[S_DISPLAYTEMPERATURE]=!Settings[S_DISPLAYTEMPERATURE];
-	  if(ROW==5) Settings[S_TEMPERATUREMAX]++;
-	  if(ROW==6) Settings[S_DISPLAYGPS]=!Settings[S_DISPLAYGPS];
-          if(ROW==7) Settings[S_COORDINATES]=!Settings[S_COORDINATES];
-	}
-
-	if(configPage == 4 && COL == 3) {
-	  if(ROW==3) rssiTimer=15;
-	  if(ROW==4) Settings[S_RSSIMAX]=rssiADC;
-	  if(ROW==5) Settings[S_DISPLAYRSSI]=!Settings[S_DISPLAYRSSI];
-	  if(ROW==6) Settings[S_UNITSYSTEM]=!Settings[S_UNITSYSTEM];
-	  if(ROW==7) {
-	    Settings[S_VIDEOSIGNALTYPE]=!Settings[S_VIDEOSIGNALTYPE];
-	    MAX7456Setup();
-	  }
-	}
-
-	if(configPage == 5 && COL == 3) {
-	  if(ROW==1) accCalibrationTimer=CALIBRATION_DELAY;
-	  if(ROW==5) magCalibrationTimer=CALIBRATION_DELAY;
-	  if(ROW==7) eepromWriteTimer=EEPROM_WRITE_DELAY;
-	}
-
-	if((ROW==10)&&(COL==3)) configPage++;
-	if(configPage>MAXPAGE) configPage = MINPAGE;
-	if((ROW==10)&&(COL==1)) configExit();
-	if((ROW==10)&&(COL==2)) saveExit();
-      }
-    }
-
-    if(waitStick == 1)
-      stickTime = millis();
-  }
-}
 
 void serialMSPreceive()
 {
@@ -544,57 +357,6 @@ void serialMSPreceive()
   }
 }
 
-void configExit()
-{
-  configPage=1;
-  ROW=10;
-  COL=3;
-  configMode=0;
-  //waitStick=3;
-  previousarmedstatus = 0;
-  if (Settings[S_RESETSTATISTICS]){  // NEB added for reset statistics if defined
-    trip=0;
-    distanceMAX=0;
-    altitudeMAX=0;
-    speedMAX=0;
-    temperMAX = -128;
-    flyingTime=0;
-  }
-  setMspRequests();
-}
-
-void saveExit()
-{
-  if (configPage==1){
-    writeReqHeader(30);
-    write8(MSP_SET_PID);
-    for(uint8_t i=0; i<PIDITEMS; i++) {
-      write8(P8[i]);
-      write8(I8[i]);
-      write8(D8[i]);
-    }
-    Serial.write(txCheckSum);
-  }
-
-  if (configPage==2){
-    writeReqHeader(7);
-    write8(MSP_SET_RC_TUNING);
-    write8(rcRate8);
-    write8(rcExpo8);
-    write8(rollPitchRate);
-    write8(yawRate);
-    write8(dynThrPID);
-    write8(thrMid8);
-    write8(thrExpo8);
-    write8(txCheckSum);
-  }
-
-  if (configPage==3 || configPage==4){
-    writeEEPROM();
-  }
-  configExit();
-}
-
 void blankserialRequest(uint8_t requestMSP)
 {
   if(requestMSP == MSP_OSD && fontMode) {
@@ -603,7 +365,7 @@ void blankserialRequest(uint8_t requestMSP)
   }
   writeReqHeader(0);
   write8(requestMSP);
-  write8(txCheckSum);
+  endSerialRequest();
 }
 
 void fontSerialRequest() {
@@ -613,5 +375,5 @@ void fontSerialRequest() {
   write8(OSD_GET_FONT);
   write8(cindex);
   write8(cindex>>8);
-  write8(txCheckSum);
+  endSerialRequest();
 }
