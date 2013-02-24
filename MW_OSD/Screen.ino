@@ -102,6 +102,25 @@ int16_t TempConverter(int16_t temp) { // deg-C to deg-C or deg-F
            temp;
 }
 
+int16_t CmToM(int32_t alt) {
+  return alt *
+           (Settings[S_UNITSYSTEM] ?
+               0.032808 :
+               0.01);
+}
+
+int16_t MToM(int16_t dist) {
+  return (Settings[S_UNITSYSTEM] ?
+             (dist * 3.2808) :
+             dist);
+}
+
+int32_t MToMf(float dist) {
+  return (Settings[S_UNITSYSTEM] ?
+             (dist * 3.2808) :
+             dist);
+}
+
 void displayTemperature(void)        // WILL WORK ONLY WITH V1.2
 {
   itoa(TempConverter(temperature), screenBuffer, 10);
@@ -422,12 +441,7 @@ void displayGPSPosition(void)
   }
 
   screenBuffer[0] = Settings[S_UNITSYSTEM] ? SYM_ALTFT : SYM_ALTM;
-  uint16_t xx;
-  if(Settings[S_UNITSYSTEM])
-    xx = GPS_altitude * 3.2808; // Mt to Feet
-  else
-    xx = GPS_altitude;          // Mt
-  itoa(xx,screenBuffer+1,10);
+  itoa(MToM(GPS_altitude), screenBuffer+1, 10);
   MAX7456_WriteString(screenBuffer,getPosition(MwGPSAltPosition));
 }
 
@@ -451,23 +465,13 @@ void displayGPS_speed(void)
 
 void displayAltitude(void)
 {
-  int16_t altitude;
-  if(Settings[S_UNITSYSTEM])
-    altitude = MwAltitude*0.032808;    // cm to feet
-  else
-    altitude = MwAltitude/100;         // cm to mt
-
-  if(armed && onTime > 5 && altitude > altitudeMAX)
-    altitudeMAX = altitude;
-
   screenBuffer[0]=Settings[S_UNITSYSTEM] ? SYM_ALTFT : SYM_ALTM;
-  itoa(altitude,screenBuffer+1,10);
+  itoa(CmToM(MwAltitude),screenBuffer+1,10);
   MAX7456_WriteString(screenBuffer,getPosition(MwAltitudePosition));
 }
 
 void displayClimbRate(void)
 {
-
   if(MwVario > 70)       screenBuffer[0] = SYM_POS_CLIMB3;
   else if(MwVario > 50)  screenBuffer[0] = SYM_POS_CLIMB2;
   else if(MwVario > 30)  screenBuffer[0] = SYM_POS_CLIMB1;
@@ -479,12 +483,7 @@ void displayClimbRate(void)
   else                   screenBuffer[0] = SYM_ZERO_CLIMB;
 
   screenBuffer[1] = Settings[S_UNITSYSTEM] ? SYM_FTS : SYM_MS;
-  int16_t vario;
-  if(Settings[S_UNITSYSTEM])
-    vario = MwVario * 0.032808;       // cm/sec ----> ft/sec
-  else
-    vario = MwVario / 100;            // cm/sec ----> mt/sec
-  itoa(vario, screenBuffer+2, 10);
+  itoa(CmToM(MwVario), screenBuffer+2, 10);
 
   MAX7456_WriteString(screenBuffer,getPosition(MwClimbRatePosition));
 }
@@ -494,17 +493,8 @@ void displayDistanceToHome(void)
   if(!GPS_fix)
     return;
 
-  int16_t dist;
-  if(Settings[S_UNITSYSTEM])
-    dist = GPS_distanceToHome * 3.2808;           // mt to feet
-  else
-    dist = GPS_distanceToHome;                    // Mt
-
-  if(dist > distanceMAX)
-    distanceMAX = dist;
-
-  screenBuffer[0] = Settings[S_UNITSYSTEM] ? SYM_DISTHOME_FT : SYM_DISTHOME_FT;
-  itoa(dist, screenBuffer+1, 10);
+  screenBuffer[0] = Settings[S_UNITSYSTEM] ? SYM_DISTHOME_FT : SYM_DISTHOME_M;
+  itoa(MToM(GPS_distanceToHome), screenBuffer+1, 10);
   MAX7456_WriteString(screenBuffer,getPosition(GPS_distanceToHomePosition));
 }
 
@@ -719,28 +709,13 @@ void displayConfigScreen(void)
     MAX7456_WriteString(itoa(Settings[S_RSSIMAX],screenBuffer,10),ALTD);
 
     MAX7456_WriteString_P(configMsg36, VELT);
-    if(Settings[S_DISPLAYRSSI]){
-      MAX7456_WriteString_P(configMsg21, VELD);
-    }
-    else{
-      MAX7456_WriteString_P(configMsg22, VELD);
-    }
+    MAX7456_WriteString_P(Settings[S_DISPLAYRSSI] ? configMsg21 : configMsg22, VELD);
 
     MAX7456_WriteString_P(configMsg37, LEVT);
-    if(Settings[S_UNITSYSTEM]==METRIC){
-      MAX7456_WriteString_P(configMsg38, LEVD-2);
-    }
-    else {
-      MAX7456_WriteString_P(configMsg39, LEVD-2);
-    }
+    MAX7456_WriteString_P( Settings[S_UNITSYSTEM] ? configMsg38 : configMsg39, LEVD-2);
 
     MAX7456_WriteString_P(configMsg40, MAGT);
-    if(Settings[S_VIDEOSIGNALTYPE]){
-      MAX7456_WriteString_P(configMsg42, MAGD+1);
-    }
-    else {
-      MAX7456_WriteString_P(configMsg41, MAGD);
-    }
+    MAX7456_WriteString_P(Settings[S_VIDEOSIGNALTYPE] ? configMsg42 : configMsg41, MAGD+1);
   }
 
   if(configPage==5)
@@ -784,13 +759,13 @@ void displayConfigScreen(void)
     MAX7456_WriteString_P(configMsg51, 38);
 
     MAX7456_WriteString_P(configMsg52, ROLLT);
-    MAX7456_WriteString(itoa(trip,screenBuffer,10),ROLLD);
+    MAX7456_WriteString(itoa(MToMf(trip),screenBuffer,10),ROLLD);
 
     MAX7456_WriteString_P(configMsg53, PITCHT);
-    MAX7456_WriteString(itoa(distanceMAX,screenBuffer,10),PITCHD);
+    MAX7456_WriteString(itoa(MToM(distanceMAX), screenBuffer,10),PITCHD);
 
     MAX7456_WriteString_P(configMsg54, YAWT);
-    MAX7456_WriteString(itoa(altitudeMAX,screenBuffer,10),YAWD);
+    MAX7456_WriteString(itoa(CmToM(altitudeMAX), screenBuffer,10),YAWD);
 
     MAX7456_WriteString_P(configMsg55, ALTT);
     MAX7456_WriteString(itoa(CMsToKMh(speedMAX), screenBuffer, 10), ALTD);

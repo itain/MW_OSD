@@ -140,10 +140,4 @@ const char MultiWiiLogoL3Add[17] PROGMEM = {
 const char disarmed_text[] PROGMEM = "UNARMED";
 const char armed_text[] PROGMEM = " ARMED";
 
-//const unsigned char speedUnitAdd[2] ={ SYM_KMH, SYM_MPH };
-//const unsigned char temperatureUnitAdd[2] = { SYM_TEMP_C, SYM_TEMP_F };
-//const unsigned char MwAltitudeAdd[2]={ SYM_ALTM, SYM_ALTFT };
-//const unsigned char MwClimbRateAdd[2]={ SYM_MS, SYM_FTS };
-//const unsigned char GPS_distanceToHomeAdd[2]={ SYM_DISTHOME_M, SYM_DISTHOME_FT };
-//const unsigned char MwGPSAltPositionAdd[2]={ SYM_ALTM, SYM_ALTFT };
 const char RushduinoVersionPosition = 35;
