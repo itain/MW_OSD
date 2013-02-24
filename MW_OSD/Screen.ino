@@ -310,25 +310,27 @@ void displayCurrentThrottle(void)
 
 void displayTime(void)
 {
-  if(flyTime < 3600) {
-    screenBuffer[0] = SYM_FLY_M;
-    formatTime(flyTime, screenBuffer+1, 0);
+  if(armed) {
+    if(flyTime < 3600) {
+      screenBuffer[0] = SYM_FLY_M;
+      formatTime(flyTime, screenBuffer+1, 0);
+    }
+    else {
+      screenBuffer[0] = SYM_FLY_H;
+      formatTime(flyTime/60, screenBuffer+1, 0);
+    }
   }
   else {
-    screenBuffer[0] = SYM_FLY_H;
-    formatTime(flyTime/60, screenBuffer+1, 0);
+    if(onTime < 3600) {
+      screenBuffer[0] = SYM_ON_M;
+      formatTime(onTime, screenBuffer+1, 0);
+    }
+    else {
+      screenBuffer[0] = SYM_ON_H;
+      formatTime(onTime/60, screenBuffer+1, 0);
+    }
   }
-  MAX7456_WriteString(screenBuffer,getPosition(flyTimePosition));
-
-  if(onTime < 3600) {
-    screenBuffer[0] = SYM_ON_M;
-    formatTime(onTime, screenBuffer+1, 0);
-  }
-  else {
-    screenBuffer[0] = SYM_ON_H;
-    formatTime(onTime/60, screenBuffer+1, 0);
-  }
-  MAX7456_WriteString(screenBuffer,getPosition(onTimePosition));
+  MAX7456_WriteString(screenBuffer,getPosition(timePosition));
 }
 
 void displayAmperage(void)
