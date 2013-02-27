@@ -20,7 +20,7 @@ boolean[] keys = new boolean[526];
 Group SG,SGModes,SGAtitude,SGRadio,SGSensors1,SGGPS; 
 
 // Checkboxs
-CheckBox checkboxSimItem[] = new CheckBox[SIMITEMS] ;
+CheckBox checkboxSimItem[] = new CheckBox[SIMITEMS];
 CheckBox ShowSimBackground, UnlockControls, SGPS_FIX;
 //Toggles
 Toggle toggleModeItems[] = new Toggle[boxnames.length] ;
@@ -61,8 +61,8 @@ void SimSetup(){
     .disableCollapse()
     .setBackgroundColor(color(0,255))
     .setBackgroundHeight(265)
-   .setLabel("Simulator Controls")
-   .setMoveable(true);
+    .setLabel("Simulator Controls")
+    .setMoveable(true);
     ;
                 
  
@@ -208,6 +208,7 @@ SGPS_altitude = ScontrolP5.addNumberbox("SGPS_altitude",0,5,40,40,14);
     .setLabel("Roll/Pitch")
     .setGroup(SGAtitude)
     ;
+
  ScontrolP5.getController("MWPitch/Roll").getCaptionLabel()
    .align(ControlP5.CENTER, ControlP5.BOTTOM_OUTSIDE).setPaddingX(0);   
  ScontrolP5.getController("MWPitch/Roll").getValueLabel().hide();
@@ -223,8 +224,6 @@ SGPS_altitude = ScontrolP5.addNumberbox("SGPS_altitude",0,5,40,40,14);
    .setDragDirection(Knob.HORIZONTAL)
    .setGroup(SGAtitude)
    ;
-   
-
 
  Throttle_Yaw = ScontrolP5.addSlider2D("Throttle/Yaw")
          .setPosition(5,5)
@@ -235,14 +234,14 @@ SGPS_altitude = ScontrolP5.addNumberbox("SGPS_altitude",0,5,40,40,14);
          .setMinX(1000) 
          .setMinY(2000)
          .setValueLabel("") 
-        .setLabel("")
+         .setLabel("")
          .setGroup(SGRadio)
         ;
  ScontrolP5.getController("Throttle/Yaw").getValueLabel().hide();
  ScontrolP5.getTooltip().register("Throttle/Yaw","Ctrl Key to hold position");
 
 
-UnlockControls =  ScontrolP5.addCheckBox("UnlockControls",60,25);
+UnlockControls = ScontrolP5.addCheckBox("UnlockControls",60,25);
     UnlockControls.setColorBackground(color(120));
     UnlockControls.setColorActive(color(255));
     UnlockControls.addItem("UnlockControls1",1);
@@ -264,12 +263,6 @@ UnlockControls =  ScontrolP5.addCheckBox("UnlockControls",60,25);
   ScontrolP5.getController("Pitch/Roll").getValueLabel().hide();
 
 
- 
- 
-
- 
-
-               
 s_Altitude = ScontrolP5.addSlider("sAltitude")
   .setPosition(5,10)
   .setSize(8,75)
@@ -345,38 +338,12 @@ s_MRSSI = ScontrolP5.addSlider("sMRSSI")
 GetModes();  
 } 
 
-boolean checkKey(int k)
-{
-  if (keys.length >= k) {
-    return keys[k];  
-  }
-  return false;
-}
-
-
-
-void keyPressed()
-{ 
-  keys[keyCode] = true;
-}
-
-
-void keyReleased()
-{ 
-  keys[keyCode] = false; 
-  ControlLock();
-  
-}
-
-
-
 void CalcAlt_Vario(){
   if (time2 < time - 1000){
     sAltitude += sVario /10;
     time2 = time;
   }
 }
-
 
 void displayMode()
 {
@@ -501,21 +468,20 @@ void displayHeading()
 }
 
 void ControlLock(){
-  Pitch_Roll.setArrayValue(new float[] {500, -500});
-  if(checkKey(CONTROL) == false) {
-    if(UnlockControls.arrayValue()[0] < 1){
-      float A = (2000-Throttle_Yaw.getArrayValue()[1])*-1;
-      Throttle_Yaw.setArrayValue(new float[] {500, A});
-      s_Vario.setValue(0);
-      sVario = 0;
-    }
-  }    
+  if(UnlockControls.arrayValue()[0] < 1){
+    Pitch_Roll.setArrayValue(new float[] {1500, 1500});
+    float A = Throttle_Yaw.getArrayValue()[1];
+    Throttle_Yaw.setArrayValue(new float[] {1500, A});
+  }
+  else {
+    Pitch_Roll.setArrayValue(new float[] {1500, 2000});
+    float A = (2000-Throttle_Yaw.getArrayValue()[1])*-1;
+    Throttle_Yaw.setArrayValue(new float[] {500, A});
+  }
 }
 
 void GetModes(){
   int bit = 1;
-  int remaining = strBoxNames.length();
-  int len = 0;
  
   mode_armed = 0;
   mode_stable = 0;
@@ -525,6 +491,7 @@ void GetModes(){
   mode_gpshold = 0;
   mode_llights = 0;
   mode_osd_switch = 0;
+
   for (int c = 0; c < boxnames.length; c++) {
     if (boxnames[c] == "ARM;") mode_armed |= bit;
     if (boxnames[c] == "ANGLE;") mode_stable |= bit;
@@ -534,10 +501,6 @@ void GetModes(){
     if (boxnames[c] == "LLIGHTS;") mode_llights |= bit;
     if (boxnames[c] == "GPS HOME;") mode_gpshome |= bit;
     if (boxnames[c] == "GPS HOLD;") mode_gpshold |= bit;
-    
     bit <<= 1L;
   }
-  
-   
- 
 }

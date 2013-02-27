@@ -23,9 +23,6 @@ String boxnames[] = { // names for dynamic generation of config GUI
     "OSD SW;",
   };
 String strBoxNames = join(boxnames,""); 
-//int modebits = 0;
-
-private static final String MSP_HEADER = "$M<";
 
 private static final int
   MSP_IDENT                =100,
@@ -145,7 +142,7 @@ void SetConfigItem(int index, int value) {
   catch(Exception e) {
   }
   finally {
-  }  	
+  }
 }
 
 
@@ -210,30 +207,17 @@ int outChecksum;
 
 
 void serialize8(int val) {
- if ((init_com==1)  && (toggleMSP_Data == true)){
-   PortWrite = true;
+  if ((init_com==1)  && (toggleMSP_Data == true)){
+    PortWrite = true;
   
-   try {
-   g_serial.write(val);
-   outChecksum ^= val;
-    } catch (Exception e) { // null pointer or serial port dead
-        System.out.println("write error " + e);
+    try {
+      g_serial.write(val);
+      outChecksum ^= val;
     }
-    
-    
-     
-     
-           
-   //NullPointerException
-      //println("Error from Serialize8");
-   
-   //catch(NullPointerException e)
-   //{
-     //System.out.println("Error from serialize8");
-   //}
-   
-  
- } 
+    catch(Exception e) { // null pointer or serial port dead
+      System.out.println("write error " + e);
+    }
+  }
 }
 
 void serialize16(int a) {
@@ -249,9 +233,6 @@ void serialize32(int a) {
 }
 
 void serializeNames(int s) {
-  //for (PGM_P c = s; pgm_read_byte(c); c++) {
-   // serialize8(pgm_read_byte(c));
-  //}
   for (int c = 0; c < strBoxNames.length(); c++) {
     serialize8(strBoxNames.charAt(c));
   }
@@ -295,18 +276,18 @@ public void evaluateCommand(byte cmd, int size) {
 
     if(cmd_internal == OSD_READ_CMD) {
       if(size == 1) {
-	// Send a NULL reply
-	headSerialReply(MSP_OSD, 1);
-	serialize8(OSD_READ_CMD);
+        // Send a NULL reply
+        headSerialReply(MSP_OSD, 1);
+        serialize8(OSD_READ_CMD);
       }
       else {
-	// Returned result from OSD.
-	for(int i = 0; i < CONFIGITEMS; i++)
-	  SetConfigItem(i, read8());
+        // Returned result from OSD.
+        for(int i = 0; i < CONFIGITEMS; i++)
+          SetConfigItem(i, read8());
 
-	// Send a NULL reply
-	headSerialReply(MSP_OSD, 1);
-	serialize8(OSD_NULL);
+        // Send a NULL reply
+        headSerialReply(MSP_OSD, 1);
+        serialize8(OSD_NULL);
       }
     }
 
@@ -319,26 +300,26 @@ public void evaluateCommand(byte cmd, int size) {
 
     if(cmd_internal == OSD_GET_FONT) {
       if( size == 1) {
-	headSerialReply(MSP_OSD, 5);
-	serialize8(OSD_GET_FONT);
-	serialize16(7456);	// safety code
-	serialize8(0);		// first char
-	serialize8(255);	// last char
+        headSerialReply(MSP_OSD, 5);
+        serialize8(OSD_GET_FONT);
+        serialize16(7456);      // safety code
+        serialize8(0);          // first char
+        serialize8(255);        // last char
       }
       else if(size == 3) {
-	int cindex = read16();
+        int cindex = read16();
         if((cindex&0xffff) == 0xffff) { // End!
           headSerialReply(MSP_OSD, 1);
           serialize8(OSD_NULL);
-	  System.out.println("End marker "+cindex);
+          System.out.println("End marker "+cindex);
           buttonSendFile.getCaptionLabel().setText("SEND");
         }
         else {
-	  headSerialReply(MSP_OSD, 56);
-	  serialize8(OSD_GET_FONT);
-	  for(int i = 0; i < 54; i++)
-	     serialize8(int(raw_font[cindex][i]));
-	  serialize8(cindex);
+          headSerialReply(MSP_OSD, 56);
+          serialize8(OSD_GET_FONT);
+          for(int i = 0; i < 54; i++)
+             serialize8(int(raw_font[cindex][i]));
+          serialize8(cindex);
 //     // XXX Fake errors to force retransmission
 //        if(int(random(3)) == 0) {
 //          System.out.println("Messed char "+cindex);
@@ -346,7 +327,7 @@ public void evaluateCommand(byte cmd, int size) {
 //        }
 //        else
 //     // End fake errors code
-	    System.out.println("Sent Char "+cindex);
+            System.out.println("Sent Char "+cindex);
           buttonSendFile.getCaptionLabel().setText(nf(cindex, 3)+"/256");
         }
       }
@@ -374,28 +355,40 @@ public void evaluateCommand(byte cmd, int size) {
     int modebits = 0;
     int BitCounter = 1;
     for (int i=0; i<boxnames.length; i++) {
-      if(toggleModeItems[i].getValue() > 0) modebits |= BitCounter;
-      BitCounter += BitCounter;
+      if(toggleModeItems[i].getValue() > 0)
+        modebits |= BitCounter;
+      BitCounter <<= 1;
     }
     
     serialize32(modebits);
     serialize8(0);   // current setting
-    break;
+  break;
     
   case MSP_BOXNAMES:
     
-     headSerialReply(MSP_BOXNAMES,strBoxNames.length());
+     headSerialReply(MSP_BOXNAMES, strBoxNames.length());
      serializeNames(strBoxNames.length());
-    break;
+  break;
 
-  case MSP_ATTITUDE:
+  case MSP_BOXIDS:
+     headSerialReply(MSP_BOXIDS, boxnames.length);
+     serialize8(1);     // ANGLE
+     serialize8(2);     // HORIZON
+     serialize8(5);     // MAG
+     serialize8(0);     // ARM
+     serialize8(16);    // LLIGHTS
+     serialize8(10);    // GPS HOME
+     serialize8(11);    // GPS HOLD
+     serialize8(19);    // OSD_SW
+  break;
    
+  case MSP_ATTITUDE:
     headSerialReply(MSP_ATTITUDE, 8);
     serialize16(int(MW_Pitch_Roll.arrayValue()[0])*10);
     serialize16(int(MW_Pitch_Roll.arrayValue()[1])*10);
     serialize16(MwHeading);
     serialize16(0);
-    break;
+  break;
 
   case MSP_RC:
    
@@ -411,7 +404,7 @@ public void evaluateCommand(byte cmd, int size) {
       for (int i=5; i<8; i++) {
        serialize16(1500);
       }
-    break;
+  break;
   
   
   case MSP_RAW_GPS:
@@ -426,7 +419,7 @@ public void evaluateCommand(byte cmd, int size) {
     serialize16(int(SGPS_altitude.value()/100));
     serialize16(int(SGPS_speed.value()));
     serialize16(355);     
-    break;
+  break;
     
   
   case MSP_COMP_GPS:
@@ -437,7 +430,7 @@ public void evaluateCommand(byte cmd, int size) {
      if(GPSheading < 0) GPSheading += 360;
      serialize16(GPSheading);
      serialize8(0);
-    break;
+  break;
   
   case MSP_ALTITUDE:
   
@@ -445,7 +438,7 @@ public void evaluateCommand(byte cmd, int size) {
     serialize32(int(sAltitude) *100);
     
     serialize16(int(sVario) *10);     
-    break;
+  break;
   
   case MSP_ANALOG:
   
@@ -453,9 +446,9 @@ public void evaluateCommand(byte cmd, int size) {
     serialize8(int(sVBat * 10));
     serialize16(0);
     serialize16(int(sMRSSI));
-    break;
+  break;
 
-   case MSP_RC_TUNING:
+  case MSP_RC_TUNING:
    
      headSerialReply(MSP_RC_TUNING, 7);
      serialize8(80);
@@ -465,9 +458,9 @@ public void evaluateCommand(byte cmd, int size) {
      serialize8(80);
      serialize8(80);
      serialize8(80);
-     break;
+  break;
 
-   case MSP_PID:
+  case MSP_PID:
    
      headSerialReply(MSP_PID, 3*10);
      for(int i=0;i<20;i++) {
@@ -475,12 +468,12 @@ public void evaluateCommand(byte cmd, int size) {
        serialize8(20);
        serialize8(70);
      }
-     break;
+  break;
 
   default:
     System.out.print("Unsupported request = ");
     System.out.println(str(icmd));
-    break;
+  break;
   }
   tailSerialReply();
 
