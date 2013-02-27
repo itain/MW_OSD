@@ -218,10 +218,8 @@ void serialMSPCheck()
           if(lastc == 'D') // "GPS HOLD;"
             mode_gpshold |= bit;
         }
-#ifdef BOX_OSD_SWITCH
         if(firstc == 'O' && lastc == 'W') // "OSD SW;"
           mode_osd_switch |= bit;
-#endif
 
         len = 0;
         bit <<= 1L;
@@ -229,9 +227,6 @@ void serialMSPCheck()
       lastc = c;
       --remaining;
     }
-#ifndef BOX_OSD_SWITCH
-    mode_osd_switch = mode_llights;
-#endif
     modeMSPRequests &=~ REQ_MSP_BOX;
   }
 #else // use MSP_BOXIDS
@@ -273,18 +268,13 @@ void serialMSPCheck()
       case 16:
         mode_llights |= bit;
         break;
-#ifdef BOX_OSD_SWITCH
-      case BOX_OSD_SWITCH:
+      case 19:
         mode_osd_switch |= bit;
         break;
-#endif
       }
       bit <<= 1;
       --remaining;
     }
-#ifndef BOX_OSD_SWITCH
-    mode_osd_switch = mode_llights;
-#endif
     modeMSPRequests &=~ REQ_MSP_BOX;
   }
 #endif
