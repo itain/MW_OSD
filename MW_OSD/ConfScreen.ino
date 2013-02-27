@@ -244,12 +244,12 @@ void displayCursor(void)
 {
   int cursorpos;
 
-  if(ROW==10){
+  if(ROW==10) {
     if(COL==3) cursorpos=SAVEP+16-1;    // page
     if(COL==1) cursorpos=SAVEP-1;       // exit
     if(COL==2) cursorpos=SAVEP+6-1;     // save/exit
   }
-  if(ROW<10){
+  else {
     if(configPage==1){
       if (ROW==9) ROW=7;
       if (ROW==8) ROW=10;
@@ -270,15 +270,16 @@ void displayCursor(void)
       if (ROW==9) ROW=7;
       if (ROW==8) ROW=10;
       cursorpos=(ROW+2)*30+10+6+6;
-     
       }
     if(configPage==4){
       COL=3;
       if (ROW==2) ROW=3;
       if (ROW==9) ROW=7;
       if (ROW==8) ROW=10;
-      if ((ROW==6)||(ROW==7)) cursorpos=(ROW+2)*30+10+6+6-2;  // Narrow/Imperial strings longer
-      else cursorpos=(ROW+2)*30+10+6+6;
+      if ((ROW==6)||(ROW==7))
+        cursorpos=(ROW+2)*30+10+6+6-2;  // Narrow/Imperial strings longer
+      else
+        cursorpos=(ROW+2)*30+10+6+6;
       }
     if(configPage==5){
       COL=3;
