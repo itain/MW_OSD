@@ -75,7 +75,7 @@ uint8_t Settings[EEPROM_SETTINGS];
 
 
 // For Settings Defaults
-uint8_t EEPROM_DEFAULT[EEPROM_SETTINGS] = {
+uint8_t EEPROM_DEFAULT[EEPROM_SETTINGS] PROGMEM = {
 1,   // used for check
 0,   // S_RSSIMIN
 255, // S_RSSIMAX

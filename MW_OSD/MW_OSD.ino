@@ -438,9 +438,10 @@ void checkEEPROM(void)
 {
   uint8_t EEPROM_Loaded = EEPROM.read(0);
   if (!EEPROM_Loaded){
-    for(uint8_t en=0;en<EEPROM_SETTINGS;en++){
-      if (EEPROM.read(en) != EEPROM_DEFAULT[en])
-        EEPROM.write(en,EEPROM_DEFAULT[en]);
+    for(uint8_t en=0;en<EEPROM_SETTINGS;en++) {
+      uint8_t d = (uint8_t)pgm_read_byte(&EEPROM_DEFAULT[en]);
+      if (EEPROM.read(en) != d)
+        EEPROM.write(en, d);
     }
   }
 }
